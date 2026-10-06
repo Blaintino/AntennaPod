@@ -26,6 +26,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import de.danoeh.antennapod.model.feed.Feed;
 import de.danoeh.antennapod.playback.service.PlaybackController;
+import de.danoeh.antennapod.playback.service.internal.MediaLibrarySessionCallback;
 import de.danoeh.antennapod.playback.service.PlaybackService;
 import de.danoeh.antennapod.playback.service.PlaybackServiceStarter;
 import de.danoeh.antennapod.storage.database.DBReader;
@@ -92,6 +93,7 @@ public class AudioPlayerFragment extends Fragment implements
     private TextView txtvLength;
     private ChapterSeekBar sbPosition;
     private ImageButton butRev;
+    private ImageButton butLongRewind;
     private TextView txtvRev;
     private PlayButton butPlay;
     private ImageButton butFF;
@@ -132,6 +134,7 @@ public class AudioPlayerFragment extends Fragment implements
         txtvPosition = root.findViewById(R.id.txtvPosition);
         txtvLength = root.findViewById(R.id.txtvLength);
         butRev = root.findViewById(R.id.butRev);
+        butLongRewind = root.findViewById(R.id.butLongRewind);
         txtvRev = root.findViewById(R.id.txtvRev);
         butPlay = root.findViewById(R.id.butPlay);
         butFF = root.findViewById(R.id.butFF);
@@ -203,6 +206,17 @@ public class AudioPlayerFragment extends Fragment implements
                 PlaybackController.bindToService(getActivity(), playbackService ->
                         playbackService.seekTo(playbackService.getCurrentPosition()
                                 - UserPreferences.getRewindSecs() * 1000));
+            }
+        });
+        butLongRewind.setOnClickListener(v -> {
+            if (BuildConfig.USE_MEDIA3_PLAYBACK_SERVICE) {
+                PlaybackController.bindToMedia3Service(getContext(), controller -> controller.sendCustomCommand(
+                        MediaLibrarySessionCallback.SESSION_COMMAND_LONG_REWIND_SLEEP, Bundle.EMPTY));
+            } else {
+                PlaybackController.bindToService(getActivity(), playbackService -> {
+                    playbackService.seekTo(Math.max(0, playbackService.getCurrentPosition() - 10 * 60 * 1000));
+                    playbackService.setSleepTimer(10 * 60 * 1000L);
+                });
             }
         });
         butRev.setOnLongClickListener(v -> {

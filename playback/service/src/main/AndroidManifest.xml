@@ -80,6 +80,11 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name="de.danoeh.antennapod.playback.service.SessionCommandReceiver"
+            android:enabled="${newServiceEnabled}"
+            android:exported="false" />
     </application>
 
     <queries>

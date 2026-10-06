@@ -78,6 +78,10 @@ public class MediaLibrarySessionCallback implements MediaLibraryService.MediaLib
             = new SessionCommand("disable_sleep_timer", Bundle.EMPTY);
     public static final SessionCommand SESSION_COMMAND_EXTEND_SLEEP_TIMER
             = new SessionCommand("extend_sleep_timer", Bundle.EMPTY);
+    public static final SessionCommand SESSION_COMMAND_TOGGLE_SLEEP_TIMER
+            = new SessionCommand(MediaButtonStarter.SESSION_COMMAND_TOGGLE_SLEEP_TIMER, Bundle.EMPTY);
+    public static final SessionCommand SESSION_COMMAND_LONG_REWIND_SLEEP
+            = new SessionCommand(MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_SLEEP, Bundle.EMPTY);
 
     private static final String EXTRA_VALUE = "value";
 
@@ -123,6 +127,8 @@ public class MediaLibrarySessionCallback implements MediaLibraryService.MediaLib
                 .add(SESSION_COMMAND_SET_SLEEP_TIMER)
                 .add(SESSION_COMMAND_DISABLE_SLEEP_TIMER)
                 .add(SESSION_COMMAND_EXTEND_SLEEP_TIMER)
+                .add(SESSION_COMMAND_TOGGLE_SLEEP_TIMER)
+                .add(SESSION_COMMAND_LONG_REWIND_SLEEP)
                 .build();
         Player.Commands playerCommands = new Player.Commands.Builder()
                 .addAllCommands()

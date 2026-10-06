@@ -14,6 +14,10 @@ android {
         // "1.2.3"          -> 1020395
         versionCode 3120395
         versionName "3.12.3"
+        applicationId "de.danoeh.antennapod.fork"
+        if (System.getenv("FORK_BUILD_NUMBER") != null) {
+            versionNameSuffix "-fork." + System.getenv("FORK_BUILD_NUMBER")
+        }
     }
 
     signingConfigs {
@@ -30,10 +34,12 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
-            resValue "string", "provider_authority", "de.danoeh.antennapod.debug.provider"
+            resValue "string", "provider_authority", "de.danoeh.antennapod.fork.debug.provider"
+            resValue "string", "app_name", "AntennaPod Fork Debug"
         }
         release {
-            resValue "string", "provider_authority", "de.danoeh.antennapod.provider"
+            resValue "string", "provider_authority", "de.danoeh.antennapod.fork.provider"
+            resValue "string", "app_name", "AntennaPod Fork"
             minifyEnabled true
             shrinkResources true
             signingConfig signingConfigs.releaseConfig

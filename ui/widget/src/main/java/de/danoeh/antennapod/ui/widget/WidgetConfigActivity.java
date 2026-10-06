@@ -33,6 +33,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
     private CheckBox ckRewind;
     private CheckBox ckFastForward;
     private CheckBox ckSkip;
+    private CheckBox ckLongRewind;
+    private CheckBox ckSleepTimer;
     private CheckBox ckCoverAsBcg;
 
     @Override
@@ -93,6 +95,10 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckFastForward.setOnClickListener(v -> displayPreviewPanel());
         ckSkip = findViewById(R.id.ckSkip);
         ckSkip.setOnClickListener(v -> displayPreviewPanel());
+        ckLongRewind = findViewById(R.id.ckLongRewind);
+        ckLongRewind.setOnClickListener(v -> displayPreviewPanel());
+        ckSleepTimer = findViewById(R.id.ckSleepTimer);
+        ckSleepTimer.setOnClickListener(v -> displayPreviewPanel());
         ckCoverAsBcg = findViewById(R.id.ckCoverAsBcg);
         ckCoverAsBcg.setOnClickListener(v -> displayPreviewPanel());
 
@@ -105,6 +111,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckRewind.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_REWIND + appWidgetId, false));
         ckFastForward.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_FAST_FORWARD + appWidgetId, false));
         ckSkip.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_SKIP + appWidgetId, false));
+        ckLongRewind.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_LONG_REWIND + appWidgetId, false));
+        ckSleepTimer.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_TIMER + appWidgetId, false));
         ckCoverAsBcg.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + appWidgetId, false));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             int color = prefs.getInt(PlayerWidget.KEY_WIDGET_COLOR + appWidgetId, PlayerWidget.DEFAULT_COLOR);
@@ -117,7 +125,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
 
     private void displayPreviewPanel() {
         boolean showExtendedPreview =
-                ckPlaybackSpeed.isChecked() || ckRewind.isChecked() || ckFastForward.isChecked() || ckSkip.isChecked();
+                ckPlaybackSpeed.isChecked() || ckRewind.isChecked() || ckFastForward.isChecked() || ckSkip.isChecked()
+                        || ckLongRewind.isChecked() || ckSleepTimer.isChecked();
         widgetPreview.findViewById(R.id.extendedButtonsContainer)
                 .setVisibility(showExtendedPreview ? View.VISIBLE : View.GONE);
         widgetPreview.findViewById(R.id.butPlay).setVisibility(showExtendedPreview ? View.GONE : View.VISIBLE);
@@ -127,6 +136,10 @@ public class WidgetConfigActivity extends ToolbarActivity {
                 .setVisibility(ckFastForward.isChecked() ? View.VISIBLE : View.GONE);
         widgetPreview.findViewById(R.id.butSkip).setVisibility(ckSkip.isChecked() ? View.VISIBLE : View.GONE);
         widgetPreview.findViewById(R.id.butRew).setVisibility(ckRewind.isChecked() ? View.VISIBLE : View.GONE);
+        widgetPreview.findViewById(R.id.butLongRewind)
+                .setVisibility(ckLongRewind.isChecked() ? View.VISIBLE : View.GONE);
+        widgetPreview.findViewById(R.id.butSleepTimer)
+                .setVisibility(ckSleepTimer.isChecked() ? View.VISIBLE : View.GONE);
 
         if (ckCoverAsBcg.isChecked()) {
             widgetPreview.findViewById(R.id.imgvCover).setVisibility(View.GONE);
@@ -163,6 +176,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
         editor.putBoolean(PlayerWidget.KEY_WIDGET_PLAYBACK_SPEED + appWidgetId, ckPlaybackSpeed.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_SKIP + appWidgetId, ckSkip.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_REWIND + appWidgetId, ckRewind.isChecked());
+        editor.putBoolean(PlayerWidget.KEY_WIDGET_LONG_REWIND + appWidgetId, ckLongRewind.isChecked());
+        editor.putBoolean(PlayerWidget.KEY_WIDGET_SLEEP_TIMER + appWidgetId, ckSleepTimer.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_FAST_FORWARD + appWidgetId, ckFastForward.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + appWidgetId, ckCoverAsBcg.isChecked());
         editor.apply();

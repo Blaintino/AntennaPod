@@ -235,6 +235,34 @@
                     android:textSize="12sp" />
 
                 <ImageButton
+                    android:id="@+id/butLongRewind"
+                    android:layout_width="@dimen/audioplayer_playercontrols_length"
+                    android:layout_height="@dimen/audioplayer_playercontrols_length"
+                    android:padding="8dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/butPlaybackSpeed"
+                    android:layout_toLeftOf="@id/butPlaybackSpeed"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/long_rewind_sleep_label"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/ic_replay" />
+
+                <TextView
+                    android:id="@+id/txtvLongRewind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/butLongRewind"
+                    android:layout_alignStart="@id/butLongRewind"
+                    android:layout_alignLeft="@id/butLongRewind"
+                    android:layout_alignEnd="@id/butLongRewind"
+                    android:layout_alignRight="@id/butLongRewind"
+                    android:clickable="false"
+                    android:gravity="center"
+                    android:text="@string/long_rewind_sleep_short_label"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="12sp" />
+
+                <ImageButton
                     android:id="@+id/butFF"
                     android:layout_width="@dimen/audioplayer_playercontrols_length"
                     android:layout_height="@dimen/audioplayer_playercontrols_length"

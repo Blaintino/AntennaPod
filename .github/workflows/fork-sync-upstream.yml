@@ -1,0 +1,40 @@
+name: Upstream übernehmen
+
+# Manuell starten (Actions → "Upstream übernehmen" → "Run workflow"): merged den
+# aktuellen Stand von AntennaPod/AntennaPod (develop) in main und stößt danach
+# den APK-Build an. Bei einem Merge-Konflikt bricht der Lauf ab, ohne etwas zu
+# pushen – dann muss der Konflikt von Hand (oder in einer Claude-Session) gelöst werden.
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_ref:
+        description: "Upstream-Branch oder -Tag (z. B. develop, master oder 3.13.0)"
+        required: true
+        default: develop
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Upstream mergen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/AntennaPod/AntennaPod.git
+          git fetch --tags upstream "${{ inputs.upstream_ref }}"
+          git merge --no-edit FETCH_HEAD
+          git push origin main
+
+      - name: APK-Build anstoßen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run fork-release.yml --ref main

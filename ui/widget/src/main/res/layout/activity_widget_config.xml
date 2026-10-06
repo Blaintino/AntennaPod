@@ -109,6 +109,20 @@
                     android:text="@string/skip_episode_label" />
 
                 <CheckBox
+                    android:id="@+id/ckLongRewind"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/widget_long_rewind_sleep_label" />
+
+                <CheckBox
+                    android:id="@+id/ckSleepTimer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/sleep_timer_label" />
+
+                <CheckBox
                     android:id="@+id/ckCoverAsBcg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

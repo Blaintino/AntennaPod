@@ -24,6 +24,8 @@ public class PlayerWidget extends AppWidgetProvider {
     public static final String KEY_WIDGET_SKIP = "widget_skip";
     public static final String KEY_WIDGET_FAST_FORWARD = "widget_fast_forward";
     public static final String KEY_WIDGET_REWIND = "widget_rewind";
+    public static final String KEY_WIDGET_LONG_REWIND = "widget_long_rewind";
+    public static final String KEY_WIDGET_SLEEP_TIMER = "widget_sleep_timer";
     public static final String KEY_WIDGET_COVER_BACKGROUND = "widget_cover_background";
     public static final int DEFAULT_COLOR = 0xff262C31;
     private static final String WORKAROUND_WORK_NAME = "WidgetUpdaterWorkaround";
@@ -74,6 +76,8 @@ public class PlayerWidget extends AppWidgetProvider {
             prefs.edit().remove(KEY_WIDGET_REWIND + appWidgetId).apply();
             prefs.edit().remove(KEY_WIDGET_FAST_FORWARD + appWidgetId).apply();
             prefs.edit().remove(KEY_WIDGET_SKIP + appWidgetId).apply();
+            prefs.edit().remove(KEY_WIDGET_LONG_REWIND + appWidgetId).apply();
+            prefs.edit().remove(KEY_WIDGET_SLEEP_TIMER + appWidgetId).apply();
             prefs.edit().remove(KEY_WIDGET_COVER_BACKGROUND + appWidgetId).apply();
         }
         AppWidgetManager manager = AppWidgetManager.getInstance(context);

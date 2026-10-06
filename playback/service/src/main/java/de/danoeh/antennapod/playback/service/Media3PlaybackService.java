@@ -97,6 +97,8 @@ public class Media3PlaybackService extends MediaLibraryService {
     private String playedMediaId = null;
     private int playbackStartPosition = -1;
     private int playedDurationCountedUntil = -1;
+    private static final long LONG_REWIND_MILLIS = 10 * 60 * 1000L;
+    private static final long LONG_REWIND_SLEEP_TIMER_MILLIS = 10 * 60 * 1000L;
     private SleepTimer sleepTimer;
     @Nullable
     private LoudnessEnhancer loudnessEnhancer = null;
@@ -326,6 +328,20 @@ public class Media3PlaybackService extends MediaLibraryService {
                 return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
             } else if (customCommand.customAction.equals(SESSION_COMMAND_EXTEND_SLEEP_TIMER.customAction)) {
                 extendSleepTimer(MediaLibrarySessionCallback.getLong(args, 0));
+                return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
+            } else if (customCommand.customAction.equals(SESSION_COMMAND_TOGGLE_SLEEP_TIMER.customAction)) {
+                if (sleepTimer != null && sleepTimer.isActive()) {
+                    disableSleepTimer();
+                } else if (session.getPlayer().getCurrentMediaItem() != null) {
+                    startSleepTimer(SleepTimerPreferences.timerMillisOrEpisodes());
+                }
+                return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
+            } else if (customCommand.customAction.equals(SESSION_COMMAND_LONG_REWIND_SLEEP.customAction)) {
+                Player sessionPlayer = session.getPlayer();
+                if (sessionPlayer.getCurrentMediaItem() != null) {
+                    sessionPlayer.seekTo(Math.max(0, sessionPlayer.getCurrentPosition() - LONG_REWIND_MILLIS));
+                    startClockSleepTimer(LONG_REWIND_SLEEP_TIMER_MILLIS);
+                }
                 return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
             }
             return super.onCustomCommand(session, controller, customCommand, args);
@@ -915,6 +931,16 @@ public class Media3PlaybackService extends MediaLibraryService {
             sleepTimer = new ClockSleepTimer(this);
         }
         sleepTimer.start(timeOrEpisodes);
+        sessionCallback.refreshNotification(mediaSession);
+    }
+
+    @UnstableApi
+    private void startClockSleepTimer(long millis) {
+        if (sleepTimer != null) {
+            sleepTimer.stop();
+        }
+        sleepTimer = new ClockSleepTimer(this);
+        sleepTimer.start(millis);
         sessionCallback.refreshNotification(mediaSession);
     }
 

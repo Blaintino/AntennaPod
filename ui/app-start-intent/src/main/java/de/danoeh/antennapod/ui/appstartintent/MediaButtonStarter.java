@@ -18,6 +18,10 @@ public abstract class MediaButtonStarter {
             "de.danoeh.antennapod.playback.service.Media3PlaybackService";
     public static final String EXTRA_MEDIA_BUTTON_SOURCE = "media_button_source";
     public static final String MEDIA_BUTTON_SOURCE_WIDGET = "widget";
+    private static final String SESSION_COMMAND_RECEIVER =
+            "de.danoeh.antennapod.playback.service.SessionCommandReceiver";
+    public static final String SESSION_COMMAND_TOGGLE_SLEEP_TIMER = "toggle_sleep_timer";
+    public static final String SESSION_COMMAND_LONG_REWIND_SLEEP = "long_rewind_sleep";
 
     public static Intent createIntent(Context context, int eventCode) {
         KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, eventCode);
@@ -36,6 +40,13 @@ public abstract class MediaButtonStarter {
                 .setStartAsForegroundService(command == Player.COMMAND_PLAY_PAUSE)
                 .setExtras(extras)
                 .build();
+    }
+
+    public static PendingIntent createSessionCommandPendingIntent(Context context, String customAction) {
+        Intent intent = new Intent(customAction);
+        intent.setClassName(context.getPackageName(), SESSION_COMMAND_RECEIVER);
+        return PendingIntent.getBroadcast(context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     @SuppressWarnings("unchecked")

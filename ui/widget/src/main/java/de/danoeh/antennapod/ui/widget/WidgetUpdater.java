@@ -118,6 +118,10 @@ public abstract class WidgetUpdater {
                     MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_FORWARD));
             views.setOnClickPendingIntent(R.id.butSkip,
                     MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM));
+            views.setOnClickPendingIntent(R.id.butLongRewind, MediaButtonStarter.createSessionCommandPendingIntent(
+                    context, MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_SLEEP));
+            views.setOnClickPendingIntent(R.id.butSleepTimer, MediaButtonStarter.createSessionCommandPendingIntent(
+                    context, MediaButtonStarter.SESSION_COMMAND_TOGGLE_SLEEP_TIMER));
         } else {
             // start the app if they click anything
             views.setOnClickPendingIntent(R.id.layout_left, startMediaPlayer);
@@ -149,15 +153,19 @@ public abstract class WidgetUpdater {
             boolean showRewind = prefs.getBoolean(PlayerWidget.KEY_WIDGET_REWIND + id, false);
             boolean showFastForward = prefs.getBoolean(PlayerWidget.KEY_WIDGET_FAST_FORWARD + id, false);
             boolean showSkip = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SKIP + id, false);
+            boolean showLongRewind = prefs.getBoolean(PlayerWidget.KEY_WIDGET_LONG_REWIND + id, false);
+            boolean showSleepTimer = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_TIMER + id, false);
             boolean showCoverAsBcg = prefs.getBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + id, false);
 
-            if (showPlaybackSpeed || showRewind || showSkip || showFastForward) {
+            if (showPlaybackSpeed || showRewind || showSkip || showFastForward || showLongRewind || showSleepTimer) {
                 views.setInt(R.id.extendedButtonsContainer, "setVisibility", View.VISIBLE);
                 views.setInt(R.id.butPlay, "setVisibility", View.GONE);
                 views.setInt(R.id.butPlaybackSpeed, "setVisibility", showPlaybackSpeed ? View.VISIBLE : View.GONE);
                 views.setInt(R.id.butRew, "setVisibility", showRewind ? View.VISIBLE : View.GONE);
                 views.setInt(R.id.butFastForward, "setVisibility", showFastForward ? View.VISIBLE : View.GONE);
                 views.setInt(R.id.butSkip, "setVisibility", showSkip ? View.VISIBLE : View.GONE);
+                views.setInt(R.id.butLongRewind, "setVisibility", showLongRewind ? View.VISIBLE : View.GONE);
+                views.setInt(R.id.butSleepTimer, "setVisibility", showSleepTimer ? View.VISIBLE : View.GONE);
             } else {
                 views.setInt(R.id.extendedButtonsContainer, "setVisibility", View.GONE);
                 views.setInt(R.id.butPlay, "setVisibility", View.VISIBLE);
