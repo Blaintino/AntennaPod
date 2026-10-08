@@ -137,6 +137,7 @@ public abstract class UserPreferences {
     public static final int NOTIFICATION_BUTTON_NEXT_CHAPTER = 3;
     public static final int NOTIFICATION_BUTTON_PLAYBACK_SPEED = 4;
     public static final int NOTIFICATION_BUTTON_SLEEP_TIMER = 5;
+    public static final int NOTIFICATION_BUTTON_LONG_REWIND_SLEEP = 6;
     public static final int EPISODE_CACHE_SIZE_UNLIMITED = -1;
     public static final String DEFAULT_PAGE_REMEMBER = "remember";
 
@@ -286,6 +287,10 @@ public abstract class UserPreferences {
 
     public static boolean showSleepTimerOnFullNotification() {
         return showButtonOnFullNotification(NOTIFICATION_BUTTON_SLEEP_TIMER);
+    }
+
+    public static boolean showLongRewindSleepOnFullNotification() {
+        return showButtonOnFullNotification(NOTIFICATION_BUTTON_LONG_REWIND_SLEEP);
     }
 
     public static FeedOrder getFeedOrder() {

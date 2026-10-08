@@ -22,7 +22,12 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
      zuletzt im Schlummer-Dialog gewählten Dauer gestartet; läuft einer, wird er
      ausgeschaltet.
    Beide Buttons tun nichts, solange keine Episode geladen ist.
-3. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
+3. **Mediensteuerung (Benachrichtigung + Sperrbildschirm):** zusätzlicher
+   Button „10 min zurück + Schlummerfunktion“, auswählbar unter
+   Einstellungen → Benutzeroberfläche → Benachrichtigungs-Buttons (dort sind
+   wie upstream genau zwei Zusatz-Buttons wählbar, Zurück-/Vorspulen sind immer
+   dabei). Icon überall (Player, Widget, Benachrichtigung): Material „Replay 10“.
+4. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
    damit der Fork **neben** dem originalen AntennaPod installiert werden kann
    (eigene Daten, eigener Provider). Abos/Fortschritt übernimmst du über
    Original → Einstellungen → Import/Export → Datenbank exportieren, dann im

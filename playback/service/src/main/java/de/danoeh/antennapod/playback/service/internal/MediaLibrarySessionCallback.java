@@ -189,6 +189,14 @@ public class MediaLibrarySessionCallback implements MediaLibraryService.MediaLib
                     .build());
         }
 
+        if (UserPreferences.showLongRewindSleepOnFullNotification()) {
+            buttons.add(new CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+                    .setSessionCommand(SESSION_COMMAND_LONG_REWIND_SLEEP)
+                    .setCustomIconResId(R.drawable.ic_notification_long_rewind)
+                    .setDisplayName(context.getString(R.string.long_rewind_sleep_label))
+                    .build());
+        }
+
         if (UserPreferences.showSleepTimerOnFullNotification()) {
             SleepTimerUpdatedEvent sleepEvent = EventBus.getDefault().getStickyEvent(SleepTimerUpdatedEvent.class);
             boolean sleepTimerActive = sleepEvent != null && !sleepEvent.isCancelled() && !sleepEvent.isOver();

@@ -259,6 +259,7 @@
         <item>@string/next_chapter</item>
         <item>@string/playback_speed</item>
         <item>@string/sleep_timer_label</item>
+        <item>@string/widget_long_rewind_sleep_label</item>
     </string-array>
 
     <string-array name="default_page_values">

@@ -245,7 +245,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/long_rewind_sleep_label"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/ic_replay" />
+                    app:srcCompat="@drawable/ic_long_rewind" />
 
                 <TextView
                     android:id="@+id/txtvLongRewind"
