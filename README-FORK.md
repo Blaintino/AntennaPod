@@ -52,9 +52,17 @@ mit den Fork-Texten kollidieren.
 
 ## Upstream-Updates übernehmen
 
-*Actions → „Upstream übernehmen“ → Run workflow* (Standard: upstream `develop`,
-alternativ ein Release-Tag wie `3.13.0`). Der Workflow merged in `main` und
-stößt danach den APK-Build an. Er bricht ohne Push ab, wenn
+Läuft **automatisch jeden Montag**: Der Workflow „Upstream übernehmen“ prüft,
+ob es ein neues offizielles AntennaPod-Release gibt (keine Pre-Releases). Wenn
+ja und es noch nicht in `main` steckt, merged er es in `main` und stößt danach
+den APK-Build an – Obtainium meldet dann das Update. Gibt es nichts Neues,
+passiert nichts.
+
+Manuell: *Actions → „Upstream übernehmen“ → Run workflow* (Standard `latest` =
+neuestes Release, alternativ ein bestimmter Tag wie `3.13.0` oder `develop` für
+den ungetesteten Entwicklungsstand).
+
+Der Workflow bricht ohne Push ab (roter Lauf, GitHub schickt eine E-Mail), wenn
 
 - es einen Merge-Konflikt gibt, oder
 - upstream Dateien unter `.github/workflows/` geändert hat (das GitHub-Token
@@ -64,10 +72,14 @@ In beiden Fällen den Merge lokal oder in einer Claude-Code-Session machen:
 
 ```bash
 git remote add upstream https://github.com/AntennaPod/AntennaPod.git  # einmalig
-git fetch upstream
-git checkout main && git merge upstream/develop
+git fetch --tags upstream
+git checkout main && git merge 3.13.0   # bzw. der Tag aus dem fehlgeschlagenen Lauf
 git push origin main
 ```
+
+Hinweis: GitHub pausiert zeitgesteuerte Workflows in öffentlichen Repos nach
+60 Tagen ohne Aktivität im Repo (mit E-Mail-Hinweis). Dann unter *Actions →
+„Upstream übernehmen“* auf „Enable workflow“ klicken.
 
 ## Lokal bauen
 

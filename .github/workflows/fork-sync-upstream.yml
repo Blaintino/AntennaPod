@@ -1,16 +1,26 @@
 name: Upstream übernehmen
 
-# Manuell starten (Actions → "Upstream übernehmen" → "Run workflow"): merged den
-# aktuellen Stand von AntennaPod/AntennaPod (develop) in main und stößt danach
-# den APK-Build an. Bei einem Merge-Konflikt bricht der Lauf ab, ohne etwas zu
-# pushen – dann muss der Konflikt von Hand (oder in einer Claude-Session) gelöst werden.
+# Übernimmt einen Stand von AntennaPod/AntennaPod per Merge in main und stößt
+# danach den APK-Build an.
+#
+# - Automatisch jeden Montag: prüft, ob es ein neues offizielles AntennaPod-Release
+#   gibt (keine Pre-Releases), und übernimmt es nur, wenn es noch nicht in main
+#   steckt. Sonst passiert nichts (kein Commit, kein Build, kein neues Release).
+# - Manuell (Actions → "Upstream übernehmen" → "Run workflow"): "latest" = neuestes
+#   offizielles Release, oder ein beliebiger Upstream-Tag/-Branch (z. B. 3.13.0, develop).
+#
+# Bei einem Merge-Konflikt bricht der Lauf ab, ohne etwas zu pushen (roter Lauf,
+# GitHub schickt eine E-Mail) – dann muss der Konflikt von Hand (oder in einer
+# Claude-Session) gelöst werden.
 on:
+  schedule:
+    - cron: "17 5 * * 1" # Montag 05:17 UTC
   workflow_dispatch:
     inputs:
       upstream_ref:
-        description: "Upstream-Branch oder -Tag (z. B. develop, master oder 3.13.0)"
+        description: "Upstream-Tag oder -Branch (z. B. 3.13.0 oder develop); latest = neuestes offizielles Release"
         required: true
-        default: develop
+        default: latest
 
 permissions:
   contents: write
@@ -26,15 +36,36 @@ jobs:
           fetch-depth: 0
 
       - name: Upstream mergen
+        id: merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Beim Zeitplan gibt es keine Eingabe → leer → "latest".
+          UPSTREAM_REF: ${{ inputs.upstream_ref }}
         run: |
+          REF="${UPSTREAM_REF:-latest}"
+          if [ "$REF" = "latest" ]; then
+            REF=$(gh release view --repo AntennaPod/AntennaPod --json tagName -q .tagName)
+          fi
+          echo "Upstream-Stand: $REF"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add upstream https://github.com/AntennaPod/AntennaPod.git
-          git fetch --tags upstream "${{ inputs.upstream_ref }}"
+          git fetch --tags upstream "$REF"
+
+          if git merge-base --is-ancestor "FETCH_HEAD^{commit}" HEAD; then
+            echo "::notice::$REF ist bereits in main enthalten – nichts zu tun."
+            echo "merged=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           git merge --no-edit FETCH_HEAD
           git push origin main
+          echo "::notice::$REF in main übernommen."
+          echo "merged=true" >> "$GITHUB_OUTPUT"
 
       - name: APK-Build anstoßen
+        if: steps.merge.outputs.merged == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run fork-release.yml --ref main
