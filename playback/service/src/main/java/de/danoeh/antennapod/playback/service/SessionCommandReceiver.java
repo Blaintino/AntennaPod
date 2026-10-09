@@ -23,11 +23,18 @@ public class SessionCommandReceiver extends BroadcastReceiver {
                 && !MediaLibrarySessionCallback.SESSION_COMMAND_LONG_REWIND_SLEEP.customAction.equals(action)) {
             return;
         }
+        Context appContext = context.getApplicationContext();
         PendingResult pendingResult = goAsync();
-        SessionToken sessionToken = new SessionToken(context,
-                new ComponentName(context, Media3PlaybackService.class));
-        ListenableFuture<MediaController> controllerFuture =
-                new MediaController.Builder(context, sessionToken).buildAsync();
+        ListenableFuture<MediaController> controllerFuture;
+        try {
+            SessionToken sessionToken = new SessionToken(appContext,
+                    new ComponentName(appContext, Media3PlaybackService.class));
+            controllerFuture = new MediaController.Builder(appContext, sessionToken).buildAsync();
+        } catch (RuntimeException e) {
+            Log.e(TAG, "Unable to connect to playback service", e);
+            pendingResult.finish();
+            return;
+        }
         controllerFuture.addListener(() -> {
             MediaController controller = null;
             try {
