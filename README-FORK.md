@@ -22,6 +22,10 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
      zuletzt im Schlummer-Dialog gewählten Dauer gestartet; läuft einer, wird er
      ausgeschaltet.
    Beide Buttons tun nichts, solange keine Episode geladen ist.
+   Außerdem die Option **„Nur Buttons“**: blendet Cover, Titel und Fortschritt
+   aus, das Widget zeigt nur noch Play/Pause und die angekreuzten Buttons. Die
+   Einstellungen gelten pro Widget – das Widget kann also z. B. einmal normal
+   und einmal als reine Button-Leiste auf dem Homescreen liegen.
 3. **Mediensteuerung (Benachrichtigung + Sperrbildschirm):** zusätzlicher
    Button „10 min zurück + Schlummerfunktion“, auswählbar unter
    Einstellungen → Benutzeroberfläche → Benachrichtigungs-Buttons (dort sind

@@ -135,6 +135,9 @@ public abstract class WidgetUpdater {
             views.setImageViewResource(R.id.butPlayExtended, R.drawable.ic_widget_play);
         }
 
+        boolean hasProgress = widgetState.media != null && getProgressString(widgetState.position,
+                widgetState.duration, widgetState.playbackSpeed) != null;
+
         ComponentName playerWidget = new ComponentName(context, PlayerWidget.class);
         AppWidgetManager manager = AppWidgetManager.getInstance(context);
         int[] widgetIds = manager.getAppWidgetIds(playerWidget);
@@ -142,9 +145,17 @@ public abstract class WidgetUpdater {
         for (int id : widgetIds) {
             Bundle options = manager.getAppWidgetOptions(id);
             SharedPreferences prefs = context.getSharedPreferences(PlayerWidget.PREFS_NAME, Context.MODE_PRIVATE);
+            boolean buttonsOnly = prefs.getBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + id, false);
+            views.setViewVisibility(R.id.txtvTitle,
+                    !buttonsOnly && widgetState.media != null ? View.VISIBLE : View.GONE);
+            views.setViewVisibility(R.id.txtvProgress, !buttonsOnly && hasProgress ? View.VISIBLE : View.GONE);
+            views.setViewVisibility(R.id.txtNoPlaying,
+                    !buttonsOnly && widgetState.media == null ? View.VISIBLE : View.GONE);
             int minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
             int columns = getCellsForSize(minWidth);
-            if (columns < 3) {
+            if (buttonsOnly) {
+                views.setViewVisibility(R.id.layout_center, View.VISIBLE);
+            } else if (columns < 3) {
                 views.setViewVisibility(R.id.layout_center, View.INVISIBLE);
             } else {
                 views.setViewVisibility(R.id.layout_center, View.VISIBLE);
@@ -157,7 +168,8 @@ public abstract class WidgetUpdater {
             boolean showSleepTimer = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_TIMER + id, false);
             boolean showCoverAsBcg = prefs.getBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + id, false);
 
-            if (showPlaybackSpeed || showRewind || showSkip || showFastForward || showLongRewind || showSleepTimer) {
+            if (buttonsOnly || showPlaybackSpeed || showRewind || showSkip || showFastForward || showLongRewind
+                    || showSleepTimer) {
                 views.setInt(R.id.extendedButtonsContainer, "setVisibility", View.VISIBLE);
                 views.setInt(R.id.butPlay, "setVisibility", View.GONE);
                 views.setInt(R.id.butPlaybackSpeed, "setVisibility", showPlaybackSpeed ? View.VISIBLE : View.GONE);
@@ -171,7 +183,11 @@ public abstract class WidgetUpdater {
                 views.setInt(R.id.butPlay, "setVisibility", View.VISIBLE);
             }
 
-            if (showCoverAsBcg) {
+            if (buttonsOnly) {
+                views.setViewVisibility(R.id.imgvCover, View.GONE);
+                views.setViewVisibility(R.id.imgvCoverLarge, View.GONE);
+                views.setViewVisibility(R.id.imgvBackground, View.GONE);
+            } else if (showCoverAsBcg) {
                 views.setViewVisibility(R.id.imgvCover, View.GONE);
                 views.setViewVisibility(R.id.imgvCoverLarge, View.GONE);
                 views.setViewVisibility(R.id.imgvBackground, View.VISIBLE);

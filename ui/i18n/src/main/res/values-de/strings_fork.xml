@@ -3,4 +3,5 @@
     <string name="long_rewind_sleep_label">10 Minuten zurückspulen und Schlummerfunktion für 10 Minuten starten</string>
     <string name="long_rewind_sleep_short_label">10 min</string>
     <string name="widget_long_rewind_sleep_label">10 min zurück + Schlummerfunktion</string>
+    <string name="widget_buttons_only_label">Nur Buttons (ohne Cover, Titel und Fortschritt)</string>
 </resources>

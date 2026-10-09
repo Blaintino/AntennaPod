@@ -36,6 +36,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
     private CheckBox ckLongRewind;
     private CheckBox ckSleepTimer;
     private CheckBox ckCoverAsBcg;
+    private CheckBox ckButtonsOnly;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +102,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckSleepTimer.setOnClickListener(v -> displayPreviewPanel());
         ckCoverAsBcg = findViewById(R.id.ckCoverAsBcg);
         ckCoverAsBcg.setOnClickListener(v -> displayPreviewPanel());
+        ckButtonsOnly = findViewById(R.id.ckButtonsOnly);
+        ckButtonsOnly.setOnClickListener(v -> displayPreviewPanel());
 
         setInitialState();
     }
@@ -114,6 +117,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckLongRewind.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_LONG_REWIND + appWidgetId, false));
         ckSleepTimer.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_TIMER + appWidgetId, false));
         ckCoverAsBcg.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + appWidgetId, false));
+        ckButtonsOnly.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + appWidgetId, false));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             int color = prefs.getInt(PlayerWidget.KEY_WIDGET_COLOR + appWidgetId, PlayerWidget.DEFAULT_COLOR);
             int opacity = Color.alpha(color) * 100 / 0xFF;
@@ -155,6 +159,16 @@ public class WidgetConfigActivity extends ToolbarActivity {
             int radius = getResources().getDimensionPixelSize(R.dimen.widget_inner_radius);
             loadCover(R.id.imgvCover, new RoundedCorners(radius));
         }
+
+        boolean buttonsOnly = ckButtonsOnly.isChecked();
+        ckCoverAsBcg.setEnabled(!buttonsOnly);
+        widgetPreview.findViewById(R.id.txtNoPlaying).setVisibility(buttonsOnly ? View.GONE : View.VISIBLE);
+        if (buttonsOnly) {
+            widgetPreview.findViewById(R.id.imgvCover).setVisibility(View.GONE);
+            widgetPreview.findViewById(R.id.imgvBackground).setVisibility(View.GONE);
+            widgetPreview.findViewById(R.id.extendedButtonsContainer).setVisibility(View.VISIBLE);
+            widgetPreview.findViewById(R.id.butPlay).setVisibility(View.GONE);
+        }
     }
 
     private void loadCover(int viewId, Transformation<android.graphics.Bitmap> transform) {
@@ -180,6 +194,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
         editor.putBoolean(PlayerWidget.KEY_WIDGET_SLEEP_TIMER + appWidgetId, ckSleepTimer.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_FAST_FORWARD + appWidgetId, ckFastForward.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + appWidgetId, ckCoverAsBcg.isChecked());
+        editor.putBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + appWidgetId, ckButtonsOnly.isChecked());
         editor.apply();
 
         Intent resultValue = new Intent();
