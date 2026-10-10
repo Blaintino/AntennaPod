@@ -9,6 +9,7 @@ import android.webkit.URLUtil;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
+import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.media3.common.DeviceInfo;
 import androidx.media3.common.ForwardingPlayer;
@@ -23,6 +24,7 @@ import androidx.media3.session.MediaLibraryService;
 import androidx.media3.session.MediaSession;
 import androidx.media3.session.SessionCommand;
 import androidx.media3.session.SessionResult;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -332,16 +334,20 @@ public class Media3PlaybackService extends MediaLibraryService {
             } else if (customCommand.customAction.equals(SESSION_COMMAND_TOGGLE_SLEEP_TIMER.customAction)) {
                 if (sleepTimer != null && sleepTimer.isActive()) {
                     disableSleepTimer();
-                } else if (session.getPlayer().getCurrentMediaItem() != null) {
-                    startSleepTimer(SleepTimerPreferences.timerMillisOrEpisodes());
+                } else {
+                    runWithCurrentMedia(session, controller, () -> {
+                        session.getPlayer().play();
+                        startSleepTimer(SleepTimerPreferences.timerMillisOrEpisodes());
+                    });
                 }
                 return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
             } else if (customCommand.customAction.equals(SESSION_COMMAND_LONG_REWIND_SLEEP.customAction)) {
-                Player sessionPlayer = session.getPlayer();
-                if (sessionPlayer.getCurrentMediaItem() != null) {
+                runWithCurrentMedia(session, controller, () -> {
+                    Player sessionPlayer = session.getPlayer();
                     sessionPlayer.seekTo(Math.max(0, sessionPlayer.getCurrentPosition() - LONG_REWIND_MILLIS));
+                    sessionPlayer.play();
                     startClockSleepTimer(LONG_REWIND_SLEEP_TIMER_MILLIS);
-                }
+                });
                 return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
             }
             return super.onCustomCommand(session, controller, customCommand, args);
@@ -932,6 +938,33 @@ public class Media3PlaybackService extends MediaLibraryService {
         }
         sleepTimer.start(timeOrEpisodes);
         sessionCallback.refreshNotification(mediaSession);
+    }
+
+    @UnstableApi
+    private void runWithCurrentMedia(MediaSession session, MediaSession.ControllerInfo controller, Runnable action) {
+        if (session.getPlayer().getCurrentMediaItem() != null) {
+            action.run();
+            return;
+        }
+        ListenableFuture<MediaSession.MediaItemsWithStartPosition> resumption =
+                sessionCallback.onPlaybackResumption(session, controller);
+        Futures.addCallback(resumption, new FutureCallback<MediaSession.MediaItemsWithStartPosition>() {
+            @Override
+            public void onSuccess(MediaSession.MediaItemsWithStartPosition result) {
+                if (result.mediaItems.isEmpty() || session.getPlayer().getCurrentMediaItem() != null) {
+                    return;
+                }
+                Player sessionPlayer = session.getPlayer();
+                sessionPlayer.setMediaItems(result.mediaItems, result.startIndex, result.startPositionMs);
+                sessionPlayer.prepare();
+                action.run();
+            }
+
+            @Override
+            public void onFailure(@NonNull Throwable t) {
+                Log.e(TAG, "Unable to resume playback", t);
+            }
+        }, ContextCompat.getMainExecutor(this));
     }
 
     @UnstableApi

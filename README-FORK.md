@@ -11,17 +11,18 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
 ## Änderungen gegenüber upstream
 
 1. **„10 min zurück + Schlummerfunktion“-Button im Player** (links neben dem
-   Geschwindigkeits-Button): springt 10 Minuten zurück und startet gleichzeitig
-   eine 10-Minuten-Schlummerfunktion (immer als Zeit-Timer, unabhängig davon, ob
+   Geschwindigkeits-Button): springt 10 Minuten zurück, startet die Wiedergabe
+   (falls pausiert) und gleichzeitig eine 10-Minuten-Schlummerfunktion (immer als Zeit-Timer, unabhängig davon, ob
    im Schlummer-Dialog „Episoden“ eingestellt ist). Ein bereits laufender Timer
    wird dabei durch den neuen 10-Minuten-Timer ersetzt.
 2. **Widget: zwei neue optionale Buttons** (beim Hinzufügen des Widgets in der
    Widget-Konfiguration ankreuzbar):
    - **10 min zurück + Schlummerfunktion** – wie der Player-Button oben.
-   - **Schlummerfunktion** – schaltet um: Läuft kein Timer, wird einer mit der
-     zuletzt im Schlummer-Dialog gewählten Dauer gestartet; läuft einer, wird er
-     ausgeschaltet.
-   Beide Buttons tun nichts, solange keine Episode geladen ist.
+   - **Schlummerfunktion** – schaltet um: Läuft kein Timer, startet er die
+     Wiedergabe und einen Timer mit der zuletzt im Schlummer-Dialog gewählten
+     Dauer; läuft einer, wird er nur ausgeschaltet (Wiedergabe bleibt, wie sie ist).
+   Ist gerade keine Episode geladen (App länger nicht benutzt), laden beide
+   Buttons zuerst die zuletzt gehörte Episode – wie der normale Play-Button.
    Außerdem die Option **„Nur Buttons“**: blendet Cover, Titel und Fortschritt
    aus, das Widget zeigt nur noch Play/Pause und die angekreuzten Buttons. Die
    Einstellungen gelten pro Widget – das Widget kann also z. B. einmal normal
