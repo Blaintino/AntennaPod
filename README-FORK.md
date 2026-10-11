@@ -1,7 +1,8 @@
 # AntennaPod Fork
 
-Persönlicher Fork von [AntennaPod/AntennaPod](https://github.com/AntennaPod/AntennaPod)
-mit ein paar kleinen Änderungen. Gebaut wird eine signierte APK per GitHub
+Persönlicher, **inoffizieller** Fork von [AntennaPod/AntennaPod](https://github.com/AntennaPod/AntennaPod)
+mit ein paar kleinen Änderungen. Kein offizielles AntennaPod-Release: Fehler in
+diesem Fork bitte nicht beim AntennaPod-Projekt melden. Gebaut wird eine signierte APK per GitHub
 Actions, installiert und aktualisiert über GitHub Releases + [Obtainium](https://obtainium.imranr.dev/)
 (gleiches Prinzip wie `android-vorlage` im Monorepo `Claude_Code_Projekte`).
 
@@ -99,3 +100,17 @@ Hinweis: GitHub pausiert zeitgesteuerte Workflows in öffentlichen Repos nach
 JDK 21 + Android SDK (`local.properties` mit `sdk.dir=…`), dann
 `./gradlew :app:assembleFreeDebug`. Die APK liegt unter
 `app/build/outputs/apk/free/debug/`.
+
+## Lizenz
+
+AntennaPod steht unter der **GNU General Public License v3.0** (siehe
+[`LICENSE`](LICENSE)); das gilt unverändert auch für diesen Fork. Copyright am
+ursprünglichen Code liegt bei den [AntennaPod-Mitwirkenden](CONTRIBUTORS.md).
+
+Hinweis nach GPL-3.0 § 5 a: Dieses Werk wurde von Frederik Langner verändert,
+erstmals am 2026-10-06; Art und Umfang der Änderungen stehen oben unter
+„Änderungen gegenüber upstream“, die einzelnen Commits sind mit „Fork:“
+markiert. Die Änderungen stehen ebenfalls unter GPL-3.0.
+
+Zu jeder APK unter *Releases* verweist die Release-Beschreibung auf den genauen
+Quellcode-Stand (Commit), aus dem sie gebaut wurde (GPL-3.0 § 6).

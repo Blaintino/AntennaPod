@@ -71,4 +71,4 @@ jobs:
         run: |
           gh release create "antennapod-fork-v${FORK_BUILD_NUMBER}" "AntennaPod-Fork-${FORK_BUILD_NUMBER}.apk" \
             --title "antennapod-fork-v${FORK_BUILD_NUMBER}" \
-            --notes "Automatischer Build von ${GITHUB_SHA::7}."
+            --notes "Inoffizieller AntennaPod-Fork, automatischer Build von ${GITHUB_SHA::7}. Lizenz: GPL-3.0. Quellcode dieses Builds: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/${GITHUB_SHA}"
