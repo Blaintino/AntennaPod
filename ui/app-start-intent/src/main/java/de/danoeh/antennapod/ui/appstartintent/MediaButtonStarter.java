@@ -3,6 +3,7 @@ package de.danoeh.antennapod.ui.appstartintent;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
@@ -18,8 +19,7 @@ public abstract class MediaButtonStarter {
             "de.danoeh.antennapod.playback.service.Media3PlaybackService";
     public static final String EXTRA_MEDIA_BUTTON_SOURCE = "media_button_source";
     public static final String MEDIA_BUTTON_SOURCE_WIDGET = "widget";
-    private static final String SESSION_COMMAND_RECEIVER =
-            "de.danoeh.antennapod.playback.service.SessionCommandReceiver";
+    public static final String EXTRA_SESSION_COMMAND = "session_command";
     public static final String SESSION_COMMAND_TOGGLE_SLEEP_TIMER = "toggle_sleep_timer";
     public static final String SESSION_COMMAND_LONG_REWIND_SLEEP = "long_rewind_sleep";
 
@@ -42,11 +42,19 @@ public abstract class MediaButtonStarter {
                 .build();
     }
 
+    @OptIn(markerClass = UnstableApi.class)
     public static PendingIntent createSessionCommandPendingIntent(Context context, String customAction) {
-        Intent intent = new Intent(customAction);
-        intent.setClassName(context.getPackageName(), SESSION_COMMAND_RECEIVER);
-        return PendingIntent.getBroadcast(context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        Bundle extras = new Bundle();
+        extras.putString(EXTRA_MEDIA_BUTTON_SOURCE, MEDIA_BUTTON_SOURCE_WIDGET);
+        extras.putString(EXTRA_SESSION_COMMAND, customAction);
+        Intent intent = PlaybackPendingIntentBuilder.createMediaButtonIntent(
+                context, Player.COMMAND_PLAY_PAUSE, extras, null, getMedia3ServiceClass());
+        int requestCode = SESSION_COMMAND_LONG_REWIND_SLEEP.equals(customAction) ? 1001 : 1002;
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+        if (Build.VERSION.SDK_INT >= 26) {
+            return PendingIntent.getForegroundService(context, requestCode, intent, flags);
+        }
+        return PendingIntent.getService(context, requestCode, intent, flags);
     }
 
     @SuppressWarnings("unchecked")

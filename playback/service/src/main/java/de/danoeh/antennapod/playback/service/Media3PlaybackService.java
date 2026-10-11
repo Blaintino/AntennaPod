@@ -64,6 +64,7 @@ import de.danoeh.antennapod.storage.preferences.SleepTimerPreferences;
 import de.danoeh.antennapod.storage.preferences.SleepTimerType;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
 import de.danoeh.antennapod.ui.appstartintent.MainActivityStarter;
+import de.danoeh.antennapod.ui.appstartintent.MediaButtonStarter;
 import de.danoeh.antennapod.ui.chapters.ChapterUtils;
 import de.danoeh.antennapod.ui.episodes.PlaybackSpeedUtils;
 import de.danoeh.antennapod.ui.notifications.NotificationUtils;
@@ -304,6 +305,19 @@ public class Media3PlaybackService extends MediaLibraryService {
     }
 
     MediaLibrarySessionCallback sessionCallback = new MediaLibrarySessionCallback(this) {
+        @Override
+        @UnstableApi
+        public boolean onMediaButtonEvent(@NonNull MediaSession session,
+                @NonNull MediaSession.ControllerInfo controllerInfo, @NonNull Intent intent) {
+            String action = intent.getStringExtra(MediaButtonStarter.EXTRA_SESSION_COMMAND);
+            if (MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_SLEEP.equals(action)
+                    || MediaButtonStarter.SESSION_COMMAND_TOGGLE_SLEEP_TIMER.equals(action)) {
+                onCustomCommand(session, controllerInfo, new SessionCommand(action, Bundle.EMPTY), Bundle.EMPTY);
+                return true;
+            }
+            return super.onMediaButtonEvent(session, controllerInfo, intent);
+        }
+
         @Override
         @NonNull
         @UnstableApi

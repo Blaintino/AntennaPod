@@ -40,10 +40,13 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
 
 Technisch: zwei neue Media3-Session-Befehle (`long_rewind_sleep`,
 `toggle_sleep_timer`) in `MediaLibrarySessionCallback`/`Media3PlaybackService`.
-Die Widget-Buttons lösen sie über den nicht exportierten
-`playback/service/.../SessionCommandReceiver` aus (die normalen Widget-Buttons
-gehen über Media-Button-Intents, die keine eigenen Befehle transportieren
-können). Neue Texte liegen in eigenen `ui/i18n/.../strings_fork.xml`
+Die Widget-Buttons lösen sie über dasselbe Media-Button-Intent wie der
+Play-Button aus (`PendingIntent.getForegroundService`, Extra `session_command`,
+eigener Request-Code pro Button), abgefangen in `onMediaButtonEvent` von
+`Media3PlaybackService`. Nur so darf der Dienst bei pausierter Wiedergabe aus
+dem Hintergrund wieder in den Vordergrund wechseln – ein erster Ansatz über
+einen BroadcastReceiver + `MediaController` funktionierte deshalb nur bei
+laufender Wiedergabe. Neue Texte liegen in eigenen `ui/i18n/.../strings_fork.xml`
 (Englisch + Deutsch), damit Übersetzungs-Updates von upstream beim Merge nicht
 mit den Fork-Texten kollidieren.
 
