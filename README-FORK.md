@@ -33,7 +33,14 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    Einstellungen → Benutzeroberfläche → Benachrichtigungs-Buttons (dort sind
    wie upstream genau zwei Zusatz-Buttons wählbar, Zurück-/Vorspulen sind immer
    dabei). Icon überall (Player, Widget, Benachrichtigung): Material „Replay 10“.
-4. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
+4. **Schlummerfunktion: „Erneutes Abspielen startet den Timer neu“**
+   (Checkbox im Schlummer-Dialog, standardmäßig aus): Hat der Timer die
+   Wiedergabe pausiert und wird innerhalb von 30 Minuten wieder auf Play
+   gedrückt – egal ob Kopfhörer, Benachrichtigung, Widget oder App –, startet
+   derselbe Timer (gleiche Dauer bzw. Episodenzahl) automatisch neu. Danach
+   (oder nach Ablauf der 30 Minuten) gilt das nicht mehr, damit z. B. am
+   nächsten Morgen kein Timer ungewollt mitläuft.
+5. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
    damit der Fork **neben** dem originalen AntennaPod installiert werden kann
    (eigene Daten, eigener Provider). Abos/Fortschritt übernimmst du über
    Original → Einstellungen → Import/Export → Datenbank exportieren, dann im

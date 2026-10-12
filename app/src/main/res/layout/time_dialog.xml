@@ -146,6 +146,12 @@
                 android:text="@string/shake_to_reset_label" />
 
             <CheckBox
+                android:id="@+id/restartOnResumeCheckbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/restart_timer_on_resume_label" />
+
+            <CheckBox
                 android:id="@+id/vibrateCheckbox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

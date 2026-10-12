@@ -102,6 +102,9 @@ public class Media3PlaybackService extends MediaLibraryService {
     private int playedDurationCountedUntil = -1;
     private static final long LONG_REWIND_MILLIS = 10 * 60 * 1000L;
     private static final long LONG_REWIND_SLEEP_TIMER_MILLIS = 10 * 60 * 1000L;
+    private static final long RESTART_ON_RESUME_WINDOW_MILLIS = 30 * 60 * 1000L;
+    private long lastSleepTimerValue = 0;
+    private boolean lastSleepTimerIsClock = true;
     private SleepTimer sleepTimer;
     @Nullable
     private LoudnessEnhancer loudnessEnhancer = null;
@@ -453,6 +456,10 @@ public class Media3PlaybackService extends MediaLibraryService {
             Schedulers.io().scheduleDirect(() ->
                     WidgetUpdater.updateWidget(Media3PlaybackService.this, widgetState));
             updatePlaybackPreferences();
+
+            if (PlaybackService.isRunning && sleepTimer == null) {
+                restartExpiredSleepTimerIfWanted();
+            }
 
             // Auto-enable sleep timer when playback starts
             if (PlaybackService.isRunning && sleepTimer == null && SleepTimerPreferences.autoEnable()) {
@@ -924,6 +931,9 @@ public class Media3PlaybackService extends MediaLibraryService {
                 applyVolumeAdaption(1.0f);
                 player.pause();
             }
+            if (SleepTimerPreferences.restartOnResume() && lastSleepTimerValue > 0) {
+                SleepTimerPreferences.setExpiredTimer(lastSleepTimerValue, lastSleepTimerIsClock);
+            }
             sleepTimer = null;
             sessionCallback.refreshNotification(mediaSession);
         } else if (event.isCancelled()) {
@@ -951,6 +961,33 @@ public class Media3PlaybackService extends MediaLibraryService {
             sleepTimer = new ClockSleepTimer(this);
         }
         sleepTimer.start(timeOrEpisodes);
+        rememberSleepTimer(timeOrEpisodes, SleepTimerPreferences.getSleepTimerType() != SleepTimerType.EPISODES);
+        sessionCallback.refreshNotification(mediaSession);
+    }
+
+    private void rememberSleepTimer(long value, boolean isClock) {
+        lastSleepTimerValue = value;
+        lastSleepTimerIsClock = isClock;
+        SleepTimerPreferences.clearExpiredTimer();
+    }
+
+    @UnstableApi
+    private void restartExpiredSleepTimerIfWanted() {
+        long expiredAt = SleepTimerPreferences.expiredTimerAt();
+        if (expiredAt == 0) {
+            return;
+        }
+        final long value = SleepTimerPreferences.expiredTimerValue();
+        final boolean isClock = SleepTimerPreferences.expiredTimerIsClock();
+        SleepTimerPreferences.clearExpiredTimer();
+        if (!SleepTimerPreferences.restartOnResume() || value <= 0
+                || System.currentTimeMillis() - expiredAt > RESTART_ON_RESUME_WINDOW_MILLIS) {
+            return;
+        }
+        Log.d(TAG, "Playback resumed after sleep timer expired, restarting timer");
+        sleepTimer = isClock ? new ClockSleepTimer(this) : new EpisodeSleepTimer(this);
+        sleepTimer.start(value);
+        rememberSleepTimer(value, isClock);
         sessionCallback.refreshNotification(mediaSession);
     }
 
@@ -988,10 +1025,12 @@ public class Media3PlaybackService extends MediaLibraryService {
         }
         sleepTimer = new ClockSleepTimer(this);
         sleepTimer.start(millis);
+        rememberSleepTimer(millis, true);
         sessionCallback.refreshNotification(mediaSession);
     }
 
     private void disableSleepTimer() {
+        SleepTimerPreferences.clearExpiredTimer();
         if (sleepTimer != null) {
             sleepTimer.stop();
             sleepTimer = null;
