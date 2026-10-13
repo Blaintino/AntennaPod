@@ -11,52 +11,44 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
 
 ## Änderungen gegenüber upstream
 
-1. **„10 min zurück + Schlummerfunktion“-Button im Player** (links neben dem
-   Geschwindigkeits-Button): springt 10 Minuten zurück, startet die Wiedergabe
-   (falls pausiert) und gleichzeitig eine 10-Minuten-Schlummerfunktion (immer als Zeit-Timer, unabhängig davon, ob
-   im Schlummer-Dialog „Episoden“ eingestellt ist). Ein bereits laufender Timer
-   wird dabei durch den neuen 10-Minuten-Timer ersetzt.
-2. **Widget: zwei neue optionale Buttons** (beim Hinzufügen des Widgets in der
-   Widget-Konfiguration ankreuzbar):
-   - **10 min zurück + Schlummerfunktion** – wie der Player-Button oben.
-   - **Schlummerfunktion** – schaltet um: Läuft kein Timer, startet er die
-     Wiedergabe und einen Timer mit der zuletzt im Schlummer-Dialog gewählten
-     Dauer; läuft einer, wird er nur ausgeschaltet (Wiedergabe bleibt, wie sie ist).
-   Ist gerade keine Episode geladen (App länger nicht benutzt), laden beide
-   Buttons zuerst die zuletzt gehörte Episode – wie der normale Play-Button.
-   Außerdem die Option **„Nur Buttons“**: blendet Cover, Titel und Fortschritt
-   aus, das Widget zeigt nur noch Play/Pause und die angekreuzten Buttons. Die
+1. **„10 min zurück + Play“-Button** – springt 10 Minuten zurück und startet
+   die Wiedergabe (falls pausiert). Ist gerade keine Episode geladen (App
+   länger nicht benutzt), wird zuerst die zuletzt gehörte Episode geladen – wie
+   beim normalen Play-Button. Einen eigenen Sleep-Timer startet der Button
+   bewusst **nicht**: das übernimmt AntennaPods eigene Option „Schlummerfunktion
+   automatisch aktivieren, wenn auf Play gedrückt wird“ (Schlummer-Dialog,
+   Zeitraum einstellbar), die bei diesem Play genauso greift wie bei jedem
+   anderen. Den Button gibt es an drei Stellen:
+   - im Player links neben dem Geschwindigkeits-Button,
+   - im Widget (optional, in der Widget-Konfiguration ankreuzbar),
+   - in der Mediensteuerung (Benachrichtigung + Sperrbildschirm), auswählbar
+     unter Einstellungen → Benutzeroberfläche → Benachrichtigungs-Buttons (dort
+     sind wie upstream genau zwei Zusatz-Buttons wählbar).
+   Icon überall: Material „Replay 10“.
+2. **Widget-Option „Nur Buttons“** – blendet Cover, Titel und Fortschritt aus,
+   das Widget zeigt nur noch Play/Pause und die angekreuzten Buttons. Die
    Einstellungen gelten pro Widget – das Widget kann also z. B. einmal normal
    und einmal als reine Button-Leiste auf dem Homescreen liegen.
-3. **Mediensteuerung (Benachrichtigung + Sperrbildschirm):** zusätzlicher
-   Button „10 min zurück + Schlummerfunktion“, auswählbar unter
-   Einstellungen → Benutzeroberfläche → Benachrichtigungs-Buttons (dort sind
-   wie upstream genau zwei Zusatz-Buttons wählbar, Zurück-/Vorspulen sind immer
-   dabei). Icon überall (Player, Widget, Benachrichtigung): Material „Replay 10“.
-4. **Schlummerfunktion: „Erneutes Abspielen startet den Timer neu“**
-   (Checkbox im Schlummer-Dialog, standardmäßig aus): Hat der Timer die
-   Wiedergabe pausiert und wird innerhalb von 30 Minuten wieder auf Play
-   gedrückt – egal ob Kopfhörer, Benachrichtigung, Widget oder App –, startet
-   derselbe Timer (gleiche Dauer bzw. Episodenzahl) automatisch neu. Danach
-   (oder nach Ablauf der 30 Minuten) gilt das nicht mehr, damit z. B. am
-   nächsten Morgen kein Timer ungewollt mitläuft.
-5. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
+3. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
    damit der Fork **neben** dem originalen AntennaPod installiert werden kann
    (eigene Daten, eigener Provider). Abos/Fortschritt übernimmst du über
    Original → Einstellungen → Import/Export → Datenbank exportieren, dann im
    Fork Datenbank importieren.
 
-Technisch: zwei neue Media3-Session-Befehle (`long_rewind_sleep`,
-`toggle_sleep_timer`) in `MediaLibrarySessionCallback`/`Media3PlaybackService`.
-Die Widget-Buttons lösen sie über dasselbe Media-Button-Intent wie der
-Play-Button aus (`PendingIntent.getForegroundService`, Extra `session_command`,
-eigener Request-Code pro Button), abgefangen in `onMediaButtonEvent` von
-`Media3PlaybackService`. Nur so darf der Dienst bei pausierter Wiedergabe aus
-dem Hintergrund wieder in den Vordergrund wechseln – ein erster Ansatz über
-einen BroadcastReceiver + `MediaController` funktionierte deshalb nur bei
-laufender Wiedergabe. Neue Texte liegen in eigenen `ui/i18n/.../strings_fork.xml`
-(Englisch + Deutsch), damit Übersetzungs-Updates von upstream beim Merge nicht
-mit den Fork-Texten kollidieren.
+Technisch: ein neuer Media3-Session-Befehl `long_rewind_play` in
+`MediaLibrarySessionCallback`/`Media3PlaybackService`. Der Widget-Button löst ihn
+über dasselbe Media-Button-Intent wie der Play-Button aus
+(`PendingIntent.getForegroundService`, Extra `session_command`, eigener
+Request-Code), abgefangen in `onMediaButtonEvent` von `Media3PlaybackService`.
+Nur so darf der Dienst bei pausierter Wiedergabe aus dem Hintergrund wieder in
+den Vordergrund wechseln. Neue Texte liegen in eigenen
+`ui/i18n/.../strings_fork.xml` (Englisch + Deutsch), damit Übersetzungs-Updates
+von upstream beim Merge nicht mit den Fork-Texten kollidieren.
+
+Wieder entfernt (weil AntennaPods eingebaute Auto-Schlummerfunktion das schon
+abdeckt): ein eigener 10-Minuten-Timer beim „10 min zurück“-Button, ein
+Sleep-Timer-Umschalt-Button im Widget und die Option „Erneutes Abspielen
+startet den Timer neu“.
 
 ## Einmalige Einrichtung
 

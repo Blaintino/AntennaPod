@@ -210,14 +210,11 @@ public class SleepTimerDialog extends BottomSheetDialogFragment {
         refreshUiState();
         viewBinding.autoEnableCheckbox.setChecked(SleepTimerPreferences.autoEnable());
         viewBinding.shakeToResetCheckbox.setChecked(SleepTimerPreferences.shakeToReset());
-        viewBinding.restartOnResumeCheckbox.setChecked(SleepTimerPreferences.restartOnResume());
         viewBinding.vibrateCheckbox.setChecked(SleepTimerPreferences.vibrate());
         refreshAutoEnableControls(SleepTimerPreferences.autoEnable());
 
         viewBinding.shakeToResetCheckbox.setOnCheckedChangeListener((buttonView, isChecked)
                 -> SleepTimerPreferences.setShakeToReset(isChecked));
-        viewBinding.restartOnResumeCheckbox.setOnCheckedChangeListener((buttonView, isChecked)
-                -> SleepTimerPreferences.setRestartOnResume(isChecked));
         viewBinding.vibrateCheckbox.setOnCheckedChangeListener((buttonView, isChecked)
                 -> SleepTimerPreferences.setVibrate(isChecked));
         viewBinding.autoEnableCheckbox.setOnCheckedChangeListener((compoundButton, isChecked)
@@ -329,7 +326,6 @@ public class SleepTimerDialog extends BottomSheetDialogFragment {
             viewBinding.autoEnableCheckbox.setVisibility(View.GONE);
             viewBinding.changeTimesButton.setVisibility(View.GONE);
             viewBinding.shakeToResetCheckbox.setVisibility(View.GONE);
-            viewBinding.restartOnResumeCheckbox.setVisibility(View.GONE);
             viewBinding.vibrateCheckbox.setVisibility(View.GONE);
             viewBinding.setSleeptimerButton.setEnabled(false);
         } else {
@@ -337,7 +333,6 @@ public class SleepTimerDialog extends BottomSheetDialogFragment {
             viewBinding.autoEnableCheckbox.setVisibility(View.VISIBLE);
             viewBinding.changeTimesButton.setVisibility(View.VISIBLE);
             viewBinding.shakeToResetCheckbox.setVisibility(isEpisodeType ? View.GONE : View.VISIBLE);
-            viewBinding.restartOnResumeCheckbox.setVisibility(View.VISIBLE);
             viewBinding.vibrateCheckbox.setVisibility(View.VISIBLE);
             viewBinding.setSleeptimerButton.setEnabled(true);
             viewBinding.timeEditText.setEnabled(true);

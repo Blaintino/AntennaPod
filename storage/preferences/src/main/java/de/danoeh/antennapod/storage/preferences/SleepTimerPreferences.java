@@ -22,10 +22,6 @@ public class SleepTimerPreferences {
     private static final String PREF_AUTO_ENABLE = "AutoEnable";
     private static final String PREF_AUTO_ENABLE_FROM = "AutoEnableFrom";
     private static final String PREF_AUTO_ENABLE_TO = "AutoEnableTo";
-    private static final String PREF_RESTART_ON_RESUME = "RestartOnResume";
-    private static final String PREF_EXPIRED_AT = "ExpiredAt";
-    private static final String PREF_EXPIRED_VALUE = "ExpiredValue";
-    private static final String PREF_EXPIRED_IS_CLOCK = "ExpiredIsClock";
 
     private static final int DEFAULT_TIMER_TYPE = 0;
     private static final int DEFAULT_AUTO_ENABLE_FROM = 22;
@@ -85,38 +81,6 @@ public class SleepTimerPreferences {
 
     public static boolean shakeToReset() {
         return prefs.getBoolean(PREF_SHAKE_TO_RESET, true);
-    }
-
-    public static void setRestartOnResume(boolean restartOnResume) {
-        prefs.edit().putBoolean(PREF_RESTART_ON_RESUME, restartOnResume).apply();
-    }
-
-    public static boolean restartOnResume() {
-        return prefs.getBoolean(PREF_RESTART_ON_RESUME, false);
-    }
-
-    public static void setExpiredTimer(long value, boolean isClock) {
-        prefs.edit()
-                .putLong(PREF_EXPIRED_AT, System.currentTimeMillis())
-                .putLong(PREF_EXPIRED_VALUE, value)
-                .putBoolean(PREF_EXPIRED_IS_CLOCK, isClock)
-                .apply();
-    }
-
-    public static void clearExpiredTimer() {
-        prefs.edit().remove(PREF_EXPIRED_AT).remove(PREF_EXPIRED_VALUE).remove(PREF_EXPIRED_IS_CLOCK).apply();
-    }
-
-    public static long expiredTimerAt() {
-        return prefs.getLong(PREF_EXPIRED_AT, 0);
-    }
-
-    public static long expiredTimerValue() {
-        return prefs.getLong(PREF_EXPIRED_VALUE, 0);
-    }
-
-    public static boolean expiredTimerIsClock() {
-        return prefs.getBoolean(PREF_EXPIRED_IS_CLOCK, true);
     }
 
     public static void setAutoEnable(boolean autoEnable) {

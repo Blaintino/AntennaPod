@@ -130,7 +130,7 @@ public class UserInterfacePreferencesFragment extends AnimatedPreferenceFragment
                 UserPreferences.NOTIFICATION_BUTTON_NEXT_CHAPTER,
                 UserPreferences.NOTIFICATION_BUTTON_PLAYBACK_SPEED,
                 UserPreferences.NOTIFICATION_BUTTON_SLEEP_TIMER,
-                UserPreferences.NOTIFICATION_BUTTON_LONG_REWIND_SLEEP,
+                UserPreferences.NOTIFICATION_BUTTON_LONG_REWIND_PLAY,
         };
         final DialogInterface.OnClickListener completeListener = (dialog, which) ->
                 UserPreferences.setFullNotificationButtons(preferredButtons);

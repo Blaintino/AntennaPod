@@ -101,10 +101,6 @@ public class Media3PlaybackService extends MediaLibraryService {
     private int playbackStartPosition = -1;
     private int playedDurationCountedUntil = -1;
     private static final long LONG_REWIND_MILLIS = 10 * 60 * 1000L;
-    private static final long LONG_REWIND_SLEEP_TIMER_MILLIS = 10 * 60 * 1000L;
-    private static final long RESTART_ON_RESUME_WINDOW_MILLIS = 30 * 60 * 1000L;
-    private long lastSleepTimerValue = 0;
-    private boolean lastSleepTimerIsClock = true;
     private SleepTimer sleepTimer;
     @Nullable
     private LoudnessEnhancer loudnessEnhancer = null;
@@ -313,8 +309,7 @@ public class Media3PlaybackService extends MediaLibraryService {
         public boolean onMediaButtonEvent(@NonNull MediaSession session,
                 @NonNull MediaSession.ControllerInfo controllerInfo, @NonNull Intent intent) {
             String action = intent.getStringExtra(MediaButtonStarter.EXTRA_SESSION_COMMAND);
-            if (MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_SLEEP.equals(action)
-                    || MediaButtonStarter.SESSION_COMMAND_TOGGLE_SLEEP_TIMER.equals(action)) {
+            if (MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY.equals(action)) {
                 onCustomCommand(session, controllerInfo, new SessionCommand(action, Bundle.EMPTY), Bundle.EMPTY);
                 return true;
             }
@@ -348,22 +343,11 @@ public class Media3PlaybackService extends MediaLibraryService {
             } else if (customCommand.customAction.equals(SESSION_COMMAND_EXTEND_SLEEP_TIMER.customAction)) {
                 extendSleepTimer(MediaLibrarySessionCallback.getLong(args, 0));
                 return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
-            } else if (customCommand.customAction.equals(SESSION_COMMAND_TOGGLE_SLEEP_TIMER.customAction)) {
-                if (sleepTimer != null && sleepTimer.isActive()) {
-                    disableSleepTimer();
-                } else {
-                    runWithCurrentMedia(session, controller, () -> {
-                        session.getPlayer().play();
-                        startSleepTimer(SleepTimerPreferences.timerMillisOrEpisodes());
-                    });
-                }
-                return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
-            } else if (customCommand.customAction.equals(SESSION_COMMAND_LONG_REWIND_SLEEP.customAction)) {
+            } else if (customCommand.customAction.equals(SESSION_COMMAND_LONG_REWIND_PLAY.customAction)) {
                 runWithCurrentMedia(session, controller, () -> {
                     Player sessionPlayer = session.getPlayer();
                     sessionPlayer.seekTo(Math.max(0, sessionPlayer.getCurrentPosition() - LONG_REWIND_MILLIS));
                     sessionPlayer.play();
-                    startClockSleepTimer(LONG_REWIND_SLEEP_TIMER_MILLIS);
                 });
                 return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
             }
@@ -456,10 +440,6 @@ public class Media3PlaybackService extends MediaLibraryService {
             Schedulers.io().scheduleDirect(() ->
                     WidgetUpdater.updateWidget(Media3PlaybackService.this, widgetState));
             updatePlaybackPreferences();
-
-            if (PlaybackService.isRunning && sleepTimer == null) {
-                restartExpiredSleepTimerIfWanted();
-            }
 
             // Auto-enable sleep timer when playback starts
             if (PlaybackService.isRunning && sleepTimer == null && SleepTimerPreferences.autoEnable()) {
@@ -931,9 +911,6 @@ public class Media3PlaybackService extends MediaLibraryService {
                 applyVolumeAdaption(1.0f);
                 player.pause();
             }
-            if (SleepTimerPreferences.restartOnResume() && lastSleepTimerValue > 0) {
-                SleepTimerPreferences.setExpiredTimer(lastSleepTimerValue, lastSleepTimerIsClock);
-            }
             sleepTimer = null;
             sessionCallback.refreshNotification(mediaSession);
         } else if (event.isCancelled()) {
@@ -961,33 +938,6 @@ public class Media3PlaybackService extends MediaLibraryService {
             sleepTimer = new ClockSleepTimer(this);
         }
         sleepTimer.start(timeOrEpisodes);
-        rememberSleepTimer(timeOrEpisodes, SleepTimerPreferences.getSleepTimerType() != SleepTimerType.EPISODES);
-        sessionCallback.refreshNotification(mediaSession);
-    }
-
-    private void rememberSleepTimer(long value, boolean isClock) {
-        lastSleepTimerValue = value;
-        lastSleepTimerIsClock = isClock;
-        SleepTimerPreferences.clearExpiredTimer();
-    }
-
-    @UnstableApi
-    private void restartExpiredSleepTimerIfWanted() {
-        long expiredAt = SleepTimerPreferences.expiredTimerAt();
-        if (expiredAt == 0) {
-            return;
-        }
-        final long value = SleepTimerPreferences.expiredTimerValue();
-        final boolean isClock = SleepTimerPreferences.expiredTimerIsClock();
-        SleepTimerPreferences.clearExpiredTimer();
-        if (!SleepTimerPreferences.restartOnResume() || value <= 0
-                || System.currentTimeMillis() - expiredAt > RESTART_ON_RESUME_WINDOW_MILLIS) {
-            return;
-        }
-        Log.d(TAG, "Playback resumed after sleep timer expired, restarting timer");
-        sleepTimer = isClock ? new ClockSleepTimer(this) : new EpisodeSleepTimer(this);
-        sleepTimer.start(value);
-        rememberSleepTimer(value, isClock);
         sessionCallback.refreshNotification(mediaSession);
     }
 
@@ -1018,19 +968,7 @@ public class Media3PlaybackService extends MediaLibraryService {
         }, ContextCompat.getMainExecutor(this));
     }
 
-    @UnstableApi
-    private void startClockSleepTimer(long millis) {
-        if (sleepTimer != null) {
-            sleepTimer.stop();
-        }
-        sleepTimer = new ClockSleepTimer(this);
-        sleepTimer.start(millis);
-        rememberSleepTimer(millis, true);
-        sessionCallback.refreshNotification(mediaSession);
-    }
-
     private void disableSleepTimer() {
-        SleepTimerPreferences.clearExpiredTimer();
         if (sleepTimer != null) {
             sleepTimer.stop();
             sleepTimer = null;

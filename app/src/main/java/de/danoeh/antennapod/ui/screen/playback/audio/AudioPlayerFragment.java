@@ -211,11 +211,11 @@ public class AudioPlayerFragment extends Fragment implements
         butLongRewind.setOnClickListener(v -> {
             if (BuildConfig.USE_MEDIA3_PLAYBACK_SERVICE) {
                 PlaybackController.bindToMedia3Service(getContext(), controller -> controller.sendCustomCommand(
-                        MediaLibrarySessionCallback.SESSION_COMMAND_LONG_REWIND_SLEEP, Bundle.EMPTY));
+                        MediaLibrarySessionCallback.SESSION_COMMAND_LONG_REWIND_PLAY, Bundle.EMPTY));
             } else {
                 PlaybackController.bindToService(getActivity(), playbackService -> {
                     playbackService.seekTo(Math.max(0, playbackService.getCurrentPosition() - 10 * 60 * 1000));
-                    playbackService.setSleepTimer(10 * 60 * 1000L);
+                    playbackService.resume();
                 });
             }
         });

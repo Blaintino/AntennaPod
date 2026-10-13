@@ -20,8 +20,7 @@ public abstract class MediaButtonStarter {
     public static final String EXTRA_MEDIA_BUTTON_SOURCE = "media_button_source";
     public static final String MEDIA_BUTTON_SOURCE_WIDGET = "widget";
     public static final String EXTRA_SESSION_COMMAND = "session_command";
-    public static final String SESSION_COMMAND_TOGGLE_SLEEP_TIMER = "toggle_sleep_timer";
-    public static final String SESSION_COMMAND_LONG_REWIND_SLEEP = "long_rewind_sleep";
+    public static final String SESSION_COMMAND_LONG_REWIND_PLAY = "long_rewind_play";
 
     public static Intent createIntent(Context context, int eventCode) {
         KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, eventCode);
@@ -49,7 +48,7 @@ public abstract class MediaButtonStarter {
         extras.putString(EXTRA_SESSION_COMMAND, customAction);
         Intent intent = PlaybackPendingIntentBuilder.createMediaButtonIntent(
                 context, Player.COMMAND_PLAY_PAUSE, extras, null, getMedia3ServiceClass());
-        int requestCode = SESSION_COMMAND_LONG_REWIND_SLEEP.equals(customAction) ? 1001 : 1002;
+        int requestCode = 1001;
         int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
         if (Build.VERSION.SDK_INT >= 26) {
             return PendingIntent.getForegroundService(context, requestCode, intent, flags);

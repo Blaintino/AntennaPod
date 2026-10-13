@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="long_rewind_sleep_label">10 Minuten zurückspulen und Schlummerfunktion für 10 Minuten starten</string>
-    <string name="long_rewind_sleep_short_label">10 min</string>
-    <string name="widget_long_rewind_sleep_label">10 min zurück + Schlummerfunktion</string>
+    <string name="long_rewind_play_label">10 Minuten zurückspulen und abspielen</string>
+    <string name="long_rewind_short_label">10 min</string>
+    <string name="widget_long_rewind_play_label">10 min zurück + Play</string>
     <string name="widget_buttons_only_label">Nur Buttons (ohne Cover, Titel und Fortschritt)</string>
-    <string name="restart_timer_on_resume_label">Erneutes Abspielen startet den Timer neu (bis 30 Min. nach Ablauf)</string>
     <string name="fork_notice_title">AntennaPod Fork – inoffizielle, veränderte Version</string>
     <string name="fork_notice_summary">Basiert auf AntennaPod (© AntennaPod-Mitwirkende), verändert von Blaintino. Lizenziert unter der GNU General Public License v3, ohne jegliche Gewährleistung. Das AntennaPod-Team leistet für diese Version KEINEN Support. Quellcode, Änderungen und Fehler: github.com/Blaintino/AntennaPod</string>
 </resources>

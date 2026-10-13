@@ -131,7 +131,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:background="?android:attr/selectableItemBackground"
-                        android:contentDescription="@string/long_rewind_sleep_label"
+                        android:contentDescription="@string/long_rewind_play_label"
                         android:layout_marginEnd="2dp"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_widget_long_rewind" />
@@ -179,17 +179,6 @@
                         android:layout_marginEnd="2dp"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_widget_skip" />
-
-                    <ImageButton
-                        android:id="@+id/butSleepTimer"
-                        android:layout_width="36dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:contentDescription="@string/sleep_timer_label"
-                        android:layout_marginEnd="2dp"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_widget_sleep" />
 
                 </LinearLayout>
 
