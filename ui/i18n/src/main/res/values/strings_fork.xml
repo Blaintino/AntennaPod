@@ -5,4 +5,6 @@
     <string name="widget_long_rewind_sleep_label">10 min back + sleep timer</string>
     <string name="widget_buttons_only_label">Buttons only (no cover, title or progress)</string>
     <string name="restart_timer_on_resume_label">Playing again restarts the timer (up to 30 min after it ran out)</string>
+    <string name="fork_notice_title">AntennaPod Fork – unofficial modified version</string>
+    <string name="fork_notice_summary">Based on AntennaPod (© AntennaPod contributors), modified by Blaintino. Licensed under the GNU General Public License v3 and provided without any warranty. The AntennaPod team does NOT provide support for this version. Source code, changes and issues: github.com/Blaintino/AntennaPod</string>
 </resources>

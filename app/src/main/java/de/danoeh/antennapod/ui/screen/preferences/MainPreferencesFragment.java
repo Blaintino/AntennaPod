@@ -49,16 +49,20 @@ public class MainPreferencesFragment extends AnimatedPreferenceFragment {
         // It must also include a prominent copyright notice.
         int packageHash = getContext().getPackageName().hashCode();
         if (packageHash != 1790437538 && packageHash != -1190467065) {
-            findPreference(PREF_CATEGORY_PROJECT).setVisible(false);
-            Preference copyrightNotice = new Preference(getContext());
-            copyrightNotice.setIcon(R.drawable.ic_info_white);
-            copyrightNotice.getIcon().mutate()
+            findPreference(PREF_VIEW_FORUM).setVisible(false);
+            findPreference(PREF_CONTRIBUTE).setVisible(false);
+            findPreference(PREF_SEND_BUG_REPORT).setVisible(false);
+            Preference forkNotice = new Preference(getContext());
+            forkNotice.setIcon(R.drawable.ic_info_white);
+            forkNotice.getIcon().mutate()
                     .setColorFilter(new PorterDuffColorFilter(0xffcc0000, PorterDuff.Mode.MULTIPLY));
-            copyrightNotice.setSummary("This application is based on AntennaPod."
-                    + " The AntennaPod team does NOT provide support for this unofficial version."
-                    + " If you can read this message, the developers of this modification"
-                    + " violate the GNU General Public License (GPL).");
-            findPreference(PREF_CATEGORY_PROJECT).getParent().addPreference(copyrightNotice);
+            forkNotice.setTitle(R.string.fork_notice_title);
+            forkNotice.setSummary(R.string.fork_notice_summary);
+            forkNotice.setOnPreferenceClickListener(preference -> {
+                IntentUtils.openInBrowser(getContext(), "https://github.com/Blaintino/AntennaPod");
+                return true;
+            });
+            findPreference(PREF_CATEGORY_PROJECT).getParent().addPreference(forkNotice);
         } else if (packageHash == -1190467065) {
             Preference debugNotice = new Preference(getContext());
             debugNotice.setIcon(R.drawable.ic_info_white);

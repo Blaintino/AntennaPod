@@ -119,5 +119,12 @@ erstmals am 2026-10-06; Art und Umfang der Änderungen stehen oben unter
 „Änderungen gegenüber upstream“, die einzelnen Commits sind mit „Fork:“
 markiert. Die Änderungen stehen ebenfalls unter GPL-3.0.
 
+In der App selbst (Einstellungen, unten) steht statt der Warnung, die
+AntennaPod bei fremden Paketnamen anzeigt, ein eigener Hinweis: inoffizielle,
+veränderte Version, GPL-3.0 ohne Gewährleistung, kein Support durch das
+AntennaPod-Team, Link auf dieses Repo (GPL-3.0 § 5 a/§ 5 d). Forum, „Mitwirken“
+und „Fehler melden“ – die direkt zum AntennaPod-Team führen – bleiben
+ausgeblendet; „Über“ (Lizenzen, Credits) und „Dokumentation“ bleiben sichtbar.
+
 Zu jeder APK unter *Releases* verweist die Release-Beschreibung auf den genauen
 Quellcode-Stand (Commit), aus dem sie gebaut wurde (GPL-3.0 § 6).
