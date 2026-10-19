@@ -19,8 +19,10 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 
 import de.danoeh.antennapod.ui.appstartintent.MediaButtonStarter;
 import de.danoeh.antennapod.ui.common.Converter;
+import de.danoeh.antennapod.storage.preferences.SleepTimerPreferences;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
 
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import de.danoeh.antennapod.model.playback.MediaType;
@@ -38,6 +40,9 @@ import de.danoeh.antennapod.ui.glide.FastBlurTransformation;
  */
 public abstract class WidgetUpdater {
     private static final String TAG = "WidgetUpdater";
+    private static final int LOCKED_BUTTON_ALPHA = 90;
+    private static final int[] PLAYBACK_BUTTON_IDS = {R.id.butPlay, R.id.butPlayExtended, R.id.butRew,
+        R.id.butFastForward, R.id.butSkip, R.id.butLongRewind, R.id.butPlaybackSpeed};
 
     public static class WidgetState {
         final Playable media;
@@ -108,18 +113,7 @@ public abstract class WidgetUpdater {
                 views.setImageViewResource(R.id.butPlayExtended, R.drawable.ic_widget_play);
                 views.setContentDescription(R.id.butPlayExtended, context.getString(R.string.play_label));
             }
-            views.setOnClickPendingIntent(R.id.butPlay,
-                    MediaButtonStarter.createPendingIntent(context, Player.COMMAND_PLAY_PAUSE));
-            views.setOnClickPendingIntent(R.id.butPlayExtended,
-                    MediaButtonStarter.createPendingIntent(context, Player.COMMAND_PLAY_PAUSE));
-            views.setOnClickPendingIntent(R.id.butRew,
-                    MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_BACK));
-            views.setOnClickPendingIntent(R.id.butFastForward,
-                    MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_FORWARD));
-            views.setOnClickPendingIntent(R.id.butSkip,
-                    MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM));
-            views.setOnClickPendingIntent(R.id.butLongRewind, MediaButtonStarter.createSessionCommandPendingIntent(
-                    context, MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY));
+            setPlaybackButtonIntents(context, views);
         } else {
             // start the app if they click anything
             views.setOnClickPendingIntent(R.id.layout_left, startMediaPlayer);
@@ -135,6 +129,10 @@ public abstract class WidgetUpdater {
 
         boolean hasProgress = widgetState.media != null && getProgressString(widgetState.position,
                 widgetState.duration, widgetState.playbackSpeed) != null;
+
+        boolean inSleepWindow = SleepTimerPreferences.isInTimeRange(SleepTimerPreferences.autoEnableFrom(),
+                SleepTimerPreferences.autoEnableTo(), Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+        boolean anySleepWindowOnly = false;
 
         ComponentName playerWidget = new ComponentName(context, PlayerWidget.class);
         AppWidgetManager manager = AppWidgetManager.getInstance(context);
@@ -216,11 +214,60 @@ public abstract class WidgetUpdater {
                     views.setImageViewResource(largeCover ? R.id.imgvCoverLarge : R.id.imgvCover, R.mipmap.ic_launcher);
                 }
             }
+            boolean sleepWindowOnly = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + id, false);
+            anySleepWindowOnly |= sleepWindowOnly;
+            boolean locked = sleepWindowOnly && !inSleepWindow;
+            for (int buttonId : PLAYBACK_BUTTON_IDS) {
+                views.setInt(buttonId, "setImageAlpha", locked ? LOCKED_BUTTON_ALPHA : 255);
+                if (locked) {
+                    views.setOnClickPendingIntent(buttonId, startMediaPlayer);
+                }
+            }
+            if (!locked && widgetState.media != null) {
+                setPlaybackButtonIntents(context, views);
+                views.setOnClickPendingIntent(R.id.butPlaybackSpeed, startPlaybackSpeedDialog);
+            }
+
             int backgroundColor = prefs.getInt(PlayerWidget.KEY_WIDGET_COLOR + id, PlayerWidget.DEFAULT_COLOR);
             views.setInt(R.id.widgetLayout, "setBackgroundColor", backgroundColor);
 
             manager.updateAppWidget(id, views);
         }
+        if (anySleepWindowOnly) {
+            WidgetUpdaterWorker.enqueueAtWindowBoundary(context, millisUntilNextSleepWindowBoundary());
+        }
+    }
+
+    private static void setPlaybackButtonIntents(Context context, RemoteViews views) {
+        views.setOnClickPendingIntent(R.id.butPlay,
+                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_PLAY_PAUSE));
+        views.setOnClickPendingIntent(R.id.butPlayExtended,
+                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_PLAY_PAUSE));
+        views.setOnClickPendingIntent(R.id.butRew,
+                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_BACK));
+        views.setOnClickPendingIntent(R.id.butFastForward,
+                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_FORWARD));
+        views.setOnClickPendingIntent(R.id.butSkip,
+                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM));
+        views.setOnClickPendingIntent(R.id.butLongRewind, MediaButtonStarter.createSessionCommandPendingIntent(
+                context, MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY));
+    }
+
+    private static long millisUntilNextSleepWindowBoundary() {
+        Calendar now = Calendar.getInstance();
+        long best = Long.MAX_VALUE;
+        for (int hour : new int[] {SleepTimerPreferences.autoEnableFrom(), SleepTimerPreferences.autoEnableTo()}) {
+            Calendar boundary = (Calendar) now.clone();
+            boundary.set(Calendar.HOUR_OF_DAY, hour);
+            boundary.set(Calendar.MINUTE, 0);
+            boundary.set(Calendar.SECOND, 5);
+            boundary.set(Calendar.MILLISECOND, 0);
+            if (!boundary.after(now)) {
+                boundary.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            best = Math.min(best, boundary.getTimeInMillis() - now.getTimeInMillis());
+        }
+        return best;
     }
 
     private static Bitmap loadCover(Context context, int iconSize, Playable media, Transformation<Bitmap> transform) {

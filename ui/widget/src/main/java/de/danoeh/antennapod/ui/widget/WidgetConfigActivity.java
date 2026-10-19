@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.Transformation;
+import de.danoeh.antennapod.storage.preferences.SleepTimerPreferences;
 import de.danoeh.antennapod.model.feed.Feed;
 import de.danoeh.antennapod.ui.common.ToolbarActivity;
 import de.danoeh.antennapod.ui.glide.FastBlurTransformation;
@@ -36,6 +37,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
     private CheckBox ckLongRewind;
     private CheckBox ckCoverAsBcg;
     private CheckBox ckButtonsOnly;
+    private CheckBox ckSleepWindowOnly;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +103,9 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckCoverAsBcg.setOnClickListener(v -> displayPreviewPanel());
         ckButtonsOnly = findViewById(R.id.ckButtonsOnly);
         ckButtonsOnly.setOnClickListener(v -> displayPreviewPanel());
+        ckSleepWindowOnly = findViewById(R.id.ckSleepWindowOnly);
+        ckSleepWindowOnly.setText(getString(R.string.widget_sleep_window_only_label,
+                SleepTimerPreferences.autoEnableFrom(), SleepTimerPreferences.autoEnableTo()));
 
         setInitialState();
     }
@@ -114,6 +119,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckLongRewind.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_LONG_REWIND + appWidgetId, false));
         ckCoverAsBcg.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + appWidgetId, false));
         ckButtonsOnly.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + appWidgetId, false));
+        ckSleepWindowOnly.setChecked(
+                prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + appWidgetId, false));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             int color = prefs.getInt(PlayerWidget.KEY_WIDGET_COLOR + appWidgetId, PlayerWidget.DEFAULT_COLOR);
             int opacity = Color.alpha(color) * 100 / 0xFF;
@@ -188,6 +195,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
         editor.putBoolean(PlayerWidget.KEY_WIDGET_FAST_FORWARD + appWidgetId, ckFastForward.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + appWidgetId, ckCoverAsBcg.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + appWidgetId, ckButtonsOnly.isChecked());
+        editor.putBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + appWidgetId, ckSleepWindowOnly.isChecked());
         editor.apply();
 
         Intent resultValue = new Intent();

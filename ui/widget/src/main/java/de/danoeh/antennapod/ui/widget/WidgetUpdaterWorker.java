@@ -8,6 +8,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+import java.util.concurrent.TimeUnit;
 import de.danoeh.antennapod.storage.database.DBReader;
 import de.danoeh.antennapod.storage.preferences.PlaybackPreferences;
 import de.danoeh.antennapod.model.playback.Playable;
@@ -21,6 +22,16 @@ public class WidgetUpdaterWorker extends Worker {
     public WidgetUpdaterWorker(@NonNull final Context context,
                                @NonNull final WorkerParameters workerParams) {
         super(context, workerParams);
+    }
+
+    private static final String WINDOW_BOUNDARY_WORK_NAME = "WidgetUpdaterWorkerWindowBoundary";
+
+    public static void enqueueAtWindowBoundary(final Context context, long delayMillis) {
+        final OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(WidgetUpdaterWorker.class)
+                .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(context)
+                .enqueueUniqueWork(WINDOW_BOUNDARY_WORK_NAME, ExistingWorkPolicy.REPLACE, workRequest);
     }
 
     public static void enqueueWork(final Context context) {

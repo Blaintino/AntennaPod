@@ -29,6 +29,13 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    das Widget zeigt nur noch Play/Pause und die angekreuzten Buttons. Die
    Einstellungen gelten pro Widget – das Widget kann also z. B. einmal normal
    und einmal als reine Button-Leiste auf dem Homescreen liegen.
+   Außerdem die Widget-Option **„Nur im Schlummer-Zeitraum bedienbar“**: nutzt
+   den Zeitraum der Schlummer-Automatik (Schlummer-Dialog, z. B. 22–6 Uhr).
+   Außerhalb davon sind die Buttons dieses Widgets halbtransparent und ein
+   Tippen öffnet nur die App, statt die Wiedergabe zu steuern – gedacht für ein
+   Widget auf dem Sperrbildschirm (Good Lock), das tagsüber in der Hosentasche
+   nichts auslösen soll. Das Widget wird zu Beginn und Ende des Zeitraums
+   automatisch aktualisiert (WorkManager).
 3. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
    damit der Fork **neben** dem originalen AntennaPod installiert werden kann
    (eigene Daten, eigener Provider). Abos/Fortschritt übernimmst du über
