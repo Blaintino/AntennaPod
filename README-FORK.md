@@ -31,8 +31,10 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    und einmal als reine Button-Leiste auf dem Homescreen liegen.
    Außerdem die Widget-Option **„Nur im Schlummer-Zeitraum bedienbar“**: nutzt
    den Zeitraum der Schlummer-Automatik (Schlummer-Dialog, z. B. 22–6 Uhr).
-   Außerhalb davon sind die Buttons dieses Widgets halbtransparent und ein
-   Tippen öffnet nur die App, statt die Wiedergabe zu steuern – gedacht für ein
+   Außerhalb davon werden die Steuerelemente dieses Widgets ausgeblendet (bei
+   „Nur Buttons“ wird zusätzlich der Hintergrund durchsichtig, das Widget ist
+   dann praktisch unsichtbar); ein Tippen auf die Fläche öffnet höchstens die
+   App, statt die Wiedergabe zu steuern – gedacht für ein
    Widget auf dem Sperrbildschirm (Good Lock), das tagsüber in der Hosentasche
    nichts auslösen soll. Das Widget wird zu Beginn und Ende des Zeitraums
    automatisch aktualisiert (WorkManager).

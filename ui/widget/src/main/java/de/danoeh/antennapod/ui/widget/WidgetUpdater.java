@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -40,7 +41,6 @@ import de.danoeh.antennapod.ui.glide.FastBlurTransformation;
  */
 public abstract class WidgetUpdater {
     private static final String TAG = "WidgetUpdater";
-    private static final int LOCKED_BUTTON_ALPHA = 90;
     private static final int[] PLAYBACK_BUTTON_IDS = {R.id.butPlay, R.id.butPlayExtended, R.id.butRew,
         R.id.butFastForward, R.id.butSkip, R.id.butLongRewind, R.id.butPlaybackSpeed};
 
@@ -217,19 +217,20 @@ public abstract class WidgetUpdater {
             boolean sleepWindowOnly = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + id, false);
             anySleepWindowOnly |= sleepWindowOnly;
             boolean locked = sleepWindowOnly && !inSleepWindow;
-            for (int buttonId : PLAYBACK_BUTTON_IDS) {
-                views.setInt(buttonId, "setImageAlpha", locked ? LOCKED_BUTTON_ALPHA : 255);
-                if (locked) {
+            if (locked) {
+                views.setInt(R.id.extendedButtonsContainer, "setVisibility", View.GONE);
+                views.setInt(R.id.butPlay, "setVisibility", View.GONE);
+                for (int buttonId : PLAYBACK_BUTTON_IDS) {
                     views.setOnClickPendingIntent(buttonId, startMediaPlayer);
                 }
-            }
-            if (!locked && widgetState.media != null) {
+            } else if (widgetState.media != null) {
                 setPlaybackButtonIntents(context, views);
                 views.setOnClickPendingIntent(R.id.butPlaybackSpeed, startPlaybackSpeedDialog);
             }
 
             int backgroundColor = prefs.getInt(PlayerWidget.KEY_WIDGET_COLOR + id, PlayerWidget.DEFAULT_COLOR);
-            views.setInt(R.id.widgetLayout, "setBackgroundColor", backgroundColor);
+            views.setInt(R.id.widgetLayout, "setBackgroundColor",
+                    locked && buttonsOnly ? Color.TRANSPARENT : backgroundColor);
 
             manager.updateAppWidget(id, views);
         }
