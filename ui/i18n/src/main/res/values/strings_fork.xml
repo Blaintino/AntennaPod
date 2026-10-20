@@ -6,5 +6,5 @@
     <string name="widget_buttons_only_label">Buttons only (no cover, title or progress)</string>
     <string name="fork_notice_title">AntennaPod Fork – unofficial modified version</string>
     <string name="fork_notice_summary">Based on AntennaPod (© AntennaPod contributors), modified by Blaintino. Licensed under the GNU General Public License v3 and provided without any warranty. The AntennaPod team does NOT provide support for this version. Source code, changes and issues: github.com/Blaintino/AntennaPod</string>
-    <string name="widget_sleep_window_only_label">Only usable during the sleep timer auto-enable window (%1$d:00–%2$d:00); otherwise the controls are hidden</string>
+    <string name="widget_sleep_window_only_label">Only usable during the sleep timer auto-enable window (%1$d:00–%2$d:00); otherwise tapping just opens the app</string>
 </resources>
