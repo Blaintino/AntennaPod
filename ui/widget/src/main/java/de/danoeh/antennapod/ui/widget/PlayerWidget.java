@@ -29,6 +29,7 @@ public class PlayerWidget extends AppWidgetProvider {
     public static final String KEY_WIDGET_SLEEP_WINDOW_ONLY = "widget_sleep_window_only";
     public static final String KEY_WIDGET_HIDE_PLAY = "widget_hide_play";
     public static final String KEY_WIDGET_SKIP_AD = "widget_skip_ad";
+    public static final String KEY_WIDGET_VERTICAL = "widget_vertical";
     public static final String KEY_WIDGET_COVER_BACKGROUND = "widget_cover_background";
     public static final int DEFAULT_COLOR = 0xff262C31;
     private static final String WORKAROUND_WORK_NAME = "WidgetUpdaterWorkaround";
@@ -84,6 +85,7 @@ public class PlayerWidget extends AppWidgetProvider {
             prefs.edit().remove(KEY_WIDGET_SLEEP_WINDOW_ONLY + appWidgetId).apply();
             prefs.edit().remove(KEY_WIDGET_HIDE_PLAY + appWidgetId).apply();
             prefs.edit().remove(KEY_WIDGET_SKIP_AD + appWidgetId).apply();
+            prefs.edit().remove(KEY_WIDGET_VERTICAL + appWidgetId).apply();
             prefs.edit().remove(KEY_WIDGET_COVER_BACKGROUND + appWidgetId).apply();
         }
         AppWidgetManager manager = AppWidgetManager.getInstance(context);

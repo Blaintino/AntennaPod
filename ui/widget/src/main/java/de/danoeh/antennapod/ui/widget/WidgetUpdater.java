@@ -82,51 +82,6 @@ public abstract class WidgetUpdater {
 
         PendingIntent startPlaybackSpeedDialog = new PlaybackSpeedActivityStarter(context).getPendingIntent();
 
-        RemoteViews views;
-        views = new RemoteViews(context.getPackageName(), R.layout.player_widget);
-
-        if (widgetState.media != null) {
-            views.setOnClickPendingIntent(R.id.layout_left, startMediaPlayer);
-            views.setOnClickPendingIntent(R.id.imgvCover, startMediaPlayer);
-            views.setOnClickPendingIntent(R.id.imgvCoverLarge, startMediaPlayer);
-            views.setOnClickPendingIntent(R.id.butPlaybackSpeed, startPlaybackSpeedDialog);
-
-            views.setTextViewText(R.id.txtvTitle, widgetState.media.getEpisodeTitle());
-            views.setViewVisibility(R.id.txtvTitle, View.VISIBLE);
-            views.setViewVisibility(R.id.txtNoPlaying, View.GONE);
-
-            String progressString = getProgressString(widgetState.position,
-                    widgetState.duration, widgetState.playbackSpeed);
-            if (progressString != null) {
-                views.setViewVisibility(R.id.txtvProgress, View.VISIBLE);
-                views.setTextViewText(R.id.txtvProgress, progressString);
-            }
-
-            if (widgetState.status == PlayerStatus.PLAYING) {
-                views.setImageViewResource(R.id.butPlay, R.drawable.ic_widget_pause);
-                views.setContentDescription(R.id.butPlay, context.getString(R.string.pause_label));
-                views.setImageViewResource(R.id.butPlayExtended, R.drawable.ic_widget_pause);
-                views.setContentDescription(R.id.butPlayExtended, context.getString(R.string.pause_label));
-            } else {
-                views.setImageViewResource(R.id.butPlay, R.drawable.ic_widget_play);
-                views.setContentDescription(R.id.butPlay, context.getString(R.string.play_label));
-                views.setImageViewResource(R.id.butPlayExtended, R.drawable.ic_widget_play);
-                views.setContentDescription(R.id.butPlayExtended, context.getString(R.string.play_label));
-            }
-            setPlaybackButtonIntents(context, views);
-        } else {
-            // start the app if they click anything
-            views.setOnClickPendingIntent(R.id.layout_left, startMediaPlayer);
-            views.setOnClickPendingIntent(R.id.butPlay, startMediaPlayer);
-            views.setOnClickPendingIntent(R.id.butPlayExtended, startMediaPlayer);
-            views.setViewVisibility(R.id.txtvProgress, View.GONE);
-            views.setViewVisibility(R.id.txtvTitle, View.GONE);
-            views.setViewVisibility(R.id.txtNoPlaying, View.VISIBLE);
-            views.setImageViewResource(R.id.imgvCover, R.mipmap.ic_launcher);
-            views.setImageViewResource(R.id.butPlay, R.drawable.ic_widget_play);
-            views.setImageViewResource(R.id.butPlayExtended, R.drawable.ic_widget_play);
-        }
-
         boolean hasProgress = widgetState.media != null && getProgressString(widgetState.position,
                 widgetState.duration, widgetState.playbackSpeed) != null;
 
@@ -141,6 +96,10 @@ public abstract class WidgetUpdater {
         for (int id : widgetIds) {
             Bundle options = manager.getAppWidgetOptions(id);
             SharedPreferences prefs = context.getSharedPreferences(PlayerWidget.PREFS_NAME, Context.MODE_PRIVATE);
+            boolean vertical = prefs.getBoolean(PlayerWidget.KEY_WIDGET_VERTICAL + id, false);
+            RemoteViews views = createViews(context, widgetState,
+                    vertical ? R.layout.player_widget_vertical : R.layout.player_widget,
+                    startMediaPlayer, startPlaybackSpeedDialog);
             boolean buttonsOnly = prefs.getBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + id, false);
             views.setViewVisibility(R.id.txtvTitle,
                     !buttonsOnly && widgetState.media != null ? View.VISIBLE : View.GONE);
@@ -242,6 +201,57 @@ public abstract class WidgetUpdater {
         if (anySleepWindowOnly) {
             WidgetUpdaterWorker.enqueueAtWindowBoundary(context, millisUntilNextSleepWindowBoundary());
         }
+    }
+
+    /**
+     * Fork: one RemoteViews per widget, because widgets may use different layouts (horizontal/vertical).
+     */
+    private static RemoteViews createViews(Context context, WidgetState widgetState, int layout,
+                                           PendingIntent startMediaPlayer, PendingIntent startPlaybackSpeedDialog) {
+        RemoteViews views = new RemoteViews(context.getPackageName(), layout);
+
+        if (widgetState.media != null) {
+            views.setOnClickPendingIntent(R.id.layout_left, startMediaPlayer);
+            views.setOnClickPendingIntent(R.id.imgvCover, startMediaPlayer);
+            views.setOnClickPendingIntent(R.id.imgvCoverLarge, startMediaPlayer);
+            views.setOnClickPendingIntent(R.id.butPlaybackSpeed, startPlaybackSpeedDialog);
+
+            views.setTextViewText(R.id.txtvTitle, widgetState.media.getEpisodeTitle());
+            views.setViewVisibility(R.id.txtvTitle, View.VISIBLE);
+            views.setViewVisibility(R.id.txtNoPlaying, View.GONE);
+
+            String progressString = getProgressString(widgetState.position,
+                    widgetState.duration, widgetState.playbackSpeed);
+            if (progressString != null) {
+                views.setViewVisibility(R.id.txtvProgress, View.VISIBLE);
+                views.setTextViewText(R.id.txtvProgress, progressString);
+            }
+
+            if (widgetState.status == PlayerStatus.PLAYING) {
+                views.setImageViewResource(R.id.butPlay, R.drawable.ic_widget_pause);
+                views.setContentDescription(R.id.butPlay, context.getString(R.string.pause_label));
+                views.setImageViewResource(R.id.butPlayExtended, R.drawable.ic_widget_pause);
+                views.setContentDescription(R.id.butPlayExtended, context.getString(R.string.pause_label));
+            } else {
+                views.setImageViewResource(R.id.butPlay, R.drawable.ic_widget_play);
+                views.setContentDescription(R.id.butPlay, context.getString(R.string.play_label));
+                views.setImageViewResource(R.id.butPlayExtended, R.drawable.ic_widget_play);
+                views.setContentDescription(R.id.butPlayExtended, context.getString(R.string.play_label));
+            }
+            setPlaybackButtonIntents(context, views);
+        } else {
+            // start the app if they click anything
+            views.setOnClickPendingIntent(R.id.layout_left, startMediaPlayer);
+            views.setOnClickPendingIntent(R.id.butPlay, startMediaPlayer);
+            views.setOnClickPendingIntent(R.id.butPlayExtended, startMediaPlayer);
+            views.setViewVisibility(R.id.txtvProgress, View.GONE);
+            views.setViewVisibility(R.id.txtvTitle, View.GONE);
+            views.setViewVisibility(R.id.txtNoPlaying, View.VISIBLE);
+            views.setImageViewResource(R.id.imgvCover, R.mipmap.ic_launcher);
+            views.setImageViewResource(R.id.butPlay, R.drawable.ic_widget_play);
+            views.setImageViewResource(R.id.butPlayExtended, R.drawable.ic_widget_play);
+        }
+        return views;
     }
 
     private static void setPlaybackButtonIntents(Context context, RemoteViews views) {

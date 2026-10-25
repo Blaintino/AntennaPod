@@ -23,4 +23,5 @@
     <string name="outro_not_found">No outro in the next 10 minutes (best score %1$s at %2$s)</string>
     <string name="outro_error">Could not read audio: %1$s</string>
     <string name="widget_hide_play_label">Hide play/pause button (only if another button is selected)</string>
+    <string name="widget_vertical_label">Arrange buttons vertically</string>
 </resources>

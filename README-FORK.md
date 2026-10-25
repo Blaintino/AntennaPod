@@ -29,7 +29,9 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    das Widget zeigt nur noch Play/Pause und die angekreuzten Buttons. Die
    Option **„Werbung überspringen“** (Button wie im Player, siehe 3.; öffnet
    kurz den Such-Dialog, auch auf dem Sperrbildschirm) und
-   **„Play/Pause-Button ausblenden“**: geht nur, wenn mindestens ein
+   **„Play/Pause-Button ausblenden“**; mit **„Buttons untereinander
+   anordnen“** stehen die Buttons vertikal (eigenes Layout
+   `player_widget_vertical.xml`): geht nur, wenn mindestens ein
    anderer Button gewählt ist (sonst wäre das Widget leer). Die
    Einstellungen gelten pro Widget – das Widget kann also z. B. einmal normal
    und einmal als reine Button-Leiste auf dem Homescreen liegen.

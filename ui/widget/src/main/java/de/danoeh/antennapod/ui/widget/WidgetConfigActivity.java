@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
@@ -40,6 +41,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
     private CheckBox ckSleepWindowOnly;
     private CheckBox ckHidePlay;
     private CheckBox ckSkipAd;
+    private CheckBox ckVertical;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +107,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckCoverAsBcg.setOnClickListener(v -> displayPreviewPanel());
         ckButtonsOnly = findViewById(R.id.ckButtonsOnly);
         ckButtonsOnly.setOnClickListener(v -> displayPreviewPanel());
+        ckVertical = findViewById(R.id.ckVertical);
+        ckVertical.setOnClickListener(v -> displayPreviewPanel());
         ckSkipAd = findViewById(R.id.ckSkipAd);
         ckSkipAd.setOnClickListener(v -> displayPreviewPanel());
         ckHidePlay = findViewById(R.id.ckHidePlay);
@@ -125,6 +129,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckLongRewind.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_LONG_REWIND + appWidgetId, false));
         ckCoverAsBcg.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + appWidgetId, false));
         ckButtonsOnly.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + appWidgetId, false));
+        ckVertical.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_VERTICAL + appWidgetId, false));
         ckSkipAd.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_SKIP_AD + appWidgetId, false));
         ckHidePlay.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_HIDE_PLAY + appWidgetId, false));
         ckSleepWindowOnly.setChecked(
@@ -155,6 +160,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
                 .setVisibility(ckLongRewind.isChecked() ? View.VISIBLE : View.GONE);
         widgetPreview.findViewById(R.id.butSkipAd).setVisibility(ckSkipAd.isChecked() ? View.VISIBLE : View.GONE);
         ckHidePlay.setEnabled(showExtendedPreview);
+        applyPreviewOrientation(ckVertical.isChecked());
         widgetPreview.findViewById(R.id.butPlayExtended)
                 .setVisibility(showExtendedPreview && ckHidePlay.isChecked() ? View.GONE : View.VISIBLE);
 
@@ -184,6 +190,27 @@ public class WidgetConfigActivity extends ToolbarActivity {
         }
     }
 
+    /**
+     * Mirrors player_widget_vertical.xml in the preview, which always inflates player_widget.xml.
+     */
+    private void applyPreviewOrientation(boolean vertical) {
+        LinearLayout container = widgetPreview.findViewById(R.id.extendedButtonsContainer);
+        container.setOrientation(vertical ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+        int buttonSize = Math.round(36 * getResources().getDisplayMetrics().density);
+        int gap = Math.round(2 * getResources().getDisplayMetrics().density);
+        for (int i = 0; i < container.getChildCount(); i++) {
+            LinearLayout.LayoutParams params = vertical
+                    ? new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1)
+                    : new LinearLayout.LayoutParams(buttonSize, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+            if (vertical) {
+                params.bottomMargin = gap;
+            } else {
+                params.setMarginEnd(gap);
+            }
+            container.getChildAt(i).setLayoutParams(params);
+        }
+    }
+
     private void loadCover(int viewId, Transformation<android.graphics.Bitmap> transform) {
         ImageView target = findViewById(viewId);
         Glide.with(this)
@@ -210,6 +237,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
         editor.putBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + appWidgetId, ckSleepWindowOnly.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_HIDE_PLAY + appWidgetId, ckHidePlay.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_SKIP_AD + appWidgetId, ckSkipAd.isChecked());
+        editor.putBoolean(PlayerWidget.KEY_WIDGET_VERTICAL + appWidgetId, ckVertical.isChecked());
         editor.apply();
 
         Intent resultValue = new Intent();
