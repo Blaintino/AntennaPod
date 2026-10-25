@@ -79,5 +79,5 @@ jobs:
           LATEST=true
           if [ "$FORK_BETA" = "true" ]; then LATEST=false; fi
           gh release create "${TAG_PREFIX}${FORK_BUILD_NUMBER}" "${APK_PREFIX}-${FORK_BUILD_NUMBER}.apk" \
-            --title "${TAG_PREFIX}${FORK_BUILD_NUMBER}" --latest="$LATEST" \
+            --title "${TAG_PREFIX}${FORK_BUILD_NUMBER}" --latest="$LATEST" --target "$GITHUB_SHA" \
             --notes "Inoffizieller AntennaPod-Fork, automatischer Build von ${GITHUB_SHA::7}. Lizenz: GPL-3.0. Quellcode dieses Builds: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/${GITHUB_SHA}"
