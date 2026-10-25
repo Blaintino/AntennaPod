@@ -300,10 +300,10 @@
                     android:layout_toEndOf="@id/butFF"
                     android:layout_toRightOf="@id/butFF"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/skip_episode_label"
+                    android:contentDescription="@string/outro_skip_label"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/ic_skip_48dp"
-                    tools:srcCompat="@drawable/ic_skip_48dp" />
+                    app:srcCompat="@drawable/ic_skip_ad_outro"
+                    tools:srcCompat="@drawable/ic_skip_ad_outro" />
 
             </RelativeLayout>
 

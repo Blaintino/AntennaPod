@@ -30,12 +30,6 @@
     </item>
 
     <item
-        android:id="@+id/skip_ad_outro_item"
-        android:icon="@drawable/ic_skip_ad_outro"
-        custom:showAsAction="ifRoom"
-        android:title="@string/outro_skip_label">
-    </item>
-    <item
         android:id="@+id/capture_ad_outro_item"
         custom:showAsAction="never"
         android:title="@string/outro_capture_label">

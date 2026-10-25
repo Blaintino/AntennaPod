@@ -40,8 +40,8 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    Player-Menü „Werbe-Outro merken“ direkt nach dem Ende eines Werbe-Outros
    antippen, Länge (0,3–5 s) und Ende (±1,5 s) so einstellen, dass beim
    Probehören nur die Erkennungsmelodie zu hören ist, speichern (eine Vorlage
-   pro Podcast, als PCM unter `files/outro/`). Der Button „Werbung
-   überspringen“ in der Player-Leiste sucht dann ab der aktuellen Position bis
+   pro Podcast, als PCM unter `files/outro/`). Der Button rechts neben „Vorspulen“
+   (ersetzt upstreams „Nächste Episode“-Button, Icon: Bogenpfeil) sucht dann ab der aktuellen Position bis
    zu 10 Minuten voraus nach dieser Melodie und springt direkt dahinter. Nur für
    heruntergeladene Episoden. Technisch: Dekodieren per `MediaCodec`, Mono
    8 kHz, 24 logarithmische Frequenzbänder pro 16-ms-Schritt, Pearson-Korrelation

@@ -262,14 +262,8 @@ public class AudioPlayerFragment extends Fragment implements
                     SkipPreferenceDialog.SkipDirection.SKIP_FORWARD, txtvFF);
             return false;
         });
-        butSkip.setOnClickListener(v -> {
-            if (BuildConfig.USE_MEDIA3_PLAYBACK_SERVICE) {
-                PlaybackController.bindToMedia3Service(getContext(), MediaController::seekToNextMediaItem);
-            } else {
-                getActivity().sendBroadcast(
-                        MediaButtonStarter.createIntent(getContext(), KeyEvent.KEYCODE_MEDIA_NEXT));
-            }
-        });
+        // Fork: the skip button jumps behind the next ad outro instead of to the next episode
+        butSkip.setOnClickListener(v -> OutroSkipper.skip(getContext(), currentMedia));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -553,9 +547,6 @@ public class AudioPlayerFragment extends Fragment implements
         } else if (itemId == R.id.transcript_item) {
             new TranscriptDialogFragment().show(
                     getActivity().getSupportFragmentManager(), TranscriptDialogFragment.TAG);
-            return true;
-        } else if (itemId == R.id.skip_ad_outro_item) {
-            OutroSkipper.skip(getContext(), currentMedia);
             return true;
         } else if (itemId == R.id.capture_ad_outro_item) {
             OutroSkipper.capture(getContext(), currentMedia);
