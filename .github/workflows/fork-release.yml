@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - beta
   workflow_dispatch:
 
 permissions:
@@ -16,6 +17,11 @@ jobs:
     env:
       # Hängt "-fork.<Laufnummer>" an den versionName an (siehe app/build.gradle).
       FORK_BUILD_NUMBER: ${{ github.run_number }}
+      # Branch beta: App-ID de.danoeh.antennapod.fork.beta, Name "AntennaPod Fork Beta"
+      # (siehe app/build.gradle), Releases "antennapod-fork-beta-v<n>".
+      FORK_BETA: ${{ github.ref == 'refs/heads/beta' }}
+      APK_PREFIX: ${{ github.ref == 'refs/heads/beta' && 'AntennaPod-Fork-Beta' || 'AntennaPod-Fork' }}
+      TAG_PREFIX: ${{ github.ref == 'refs/heads/beta' && 'antennapod-fork-beta-v' || 'antennapod-fork-v' }}
       HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +52,7 @@ jobs:
             -PreleaseStorePassword="$ANDROID_KEYSTORE_PASSWORD" \
             -PreleaseKeyAlias="$ANDROID_KEY_ALIAS" \
             -PreleaseKeyPassword="$ANDROID_KEY_PASSWORD"
-          cp app/build/outputs/apk/free/release/app-free-release.apk "AntennaPod-Fork-${FORK_BUILD_NUMBER}.apk"
+          cp app/build/outputs/apk/free/release/app-free-release.apk "${APK_PREFIX}-${FORK_BUILD_NUMBER}.apk"
 
       # Ohne Secrets: Debug-APK, damit der Build trotzdem grün ist. Debug-APKs
       # aus dem CI sind bei jedem Lauf anders signiert – Updates darüber
@@ -56,7 +62,7 @@ jobs:
         run: |
           echo "::warning::Keine Signatur-Secrets hinterlegt – es wird nur eine Debug-APK gebaut (siehe README-FORK.md)."
           ./gradlew --no-daemon :app:assembleFreeDebug
-          cp app/build/outputs/apk/free/debug/app-free-debug.apk "AntennaPod-Fork-${FORK_BUILD_NUMBER}-debug.apk"
+          cp app/build/outputs/apk/free/debug/app-free-debug.apk "${APK_PREFIX}-${FORK_BUILD_NUMBER}-debug.apk"
 
       - name: APK als Artefakt hochladen
         uses: actions/upload-artifact@v4
@@ -64,11 +70,14 @@ jobs:
           name: AntennaPod-Fork-apk
           path: AntennaPod-Fork-*.apk
 
-      - name: GitHub Release anlegen (nur main, nur signiert)
-        if: github.ref == 'refs/heads/main' && env.HAS_KEYSTORE == 'true'
+      - name: GitHub Release anlegen (nur main/beta, nur signiert)
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/beta') && env.HAS_KEYSTORE == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "antennapod-fork-v${FORK_BUILD_NUMBER}" "AntennaPod-Fork-${FORK_BUILD_NUMBER}.apk" \
-            --title "antennapod-fork-v${FORK_BUILD_NUMBER}" \
+          # Beta-Releases nie als "Latest" markieren, damit die stabile Version die neueste bleibt.
+          LATEST=true
+          if [ "$FORK_BETA" = "true" ]; then LATEST=false; fi
+          gh release create "${TAG_PREFIX}${FORK_BUILD_NUMBER}" "${APK_PREFIX}-${FORK_BUILD_NUMBER}.apk" \
+            --title "${TAG_PREFIX}${FORK_BUILD_NUMBER}" --latest="$LATEST" --target "$GITHUB_SHA" \
             --notes "Inoffizieller AntennaPod-Fork, automatischer Build von ${GITHUB_SHA::7}. Lizenz: GPL-3.0. Quellcode dieses Builds: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/${GITHUB_SHA}"

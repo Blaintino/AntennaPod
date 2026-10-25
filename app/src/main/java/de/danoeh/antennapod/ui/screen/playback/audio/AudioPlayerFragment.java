@@ -43,6 +43,7 @@ import de.danoeh.antennapod.ui.screen.playback.PlayButton;
 import de.danoeh.antennapod.ui.screen.playback.SleepTimerDialog;
 import de.danoeh.antennapod.ui.screen.playback.TranscriptDialogFragment;
 import de.danoeh.antennapod.ui.screen.playback.VariableSpeedDialog;
+import de.danoeh.antennapod.ui.screen.playback.outro.OutroSkipper;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -552,6 +553,12 @@ public class AudioPlayerFragment extends Fragment implements
         } else if (itemId == R.id.transcript_item) {
             new TranscriptDialogFragment().show(
                     getActivity().getSupportFragmentManager(), TranscriptDialogFragment.TAG);
+            return true;
+        } else if (itemId == R.id.skip_ad_outro_item) {
+            OutroSkipper.skip(getContext(), currentMedia);
+            return true;
+        } else if (itemId == R.id.capture_ad_outro_item) {
+            OutroSkipper.capture(getContext(), currentMedia);
             return true;
         } else if (itemId == R.id.open_feed_item) {
             if (feedItem != null) {
