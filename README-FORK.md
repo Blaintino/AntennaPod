@@ -36,7 +36,7 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    Widget auf dem Sperrbildschirm (Good Lock), das tagsüber in der Hosentasche
    nichts auslösen soll. Das Widget wird zu Beginn und Ende des Zeitraums
    automatisch aktualisiert (WorkManager).
-3. **Werbung überspringen (Prototyp, nur Branch `feature/werbe-outro`)** – im
+3. **Werbung überspringen (Prototyp, Branch `feature/werbe-outro` / `beta`)** – im
    Player-Menü „Werbe-Outro merken“ direkt nach dem Ende eines Werbe-Outros
    antippen, Länge (0,3–5 s) und Ende (±1,5 s) so einstellen, dass beim
    Probehören nur die Erkennungsmelodie zu hören ist, speichern (eine Vorlage
@@ -80,6 +80,12 @@ startet den Timer neu“.
    (als Artefakt, kein Release), über die keine Updates möglich sind.
 3. **Obtainium:** App hinzufügen mit der URL dieses Repos; unter
    „Filter release titles by regular expression“ `^antennapod-fork-v` eintragen.
+4. **Beta (optional):** Jeder Push auf den Branch `beta` baut eine eigene App
+   „AntennaPod Fork Beta“ (App-ID `de.danoeh.antennapod.fork.beta`, eigene Daten,
+   läuft neben der stabilen App) und veröffentlicht sie als Release
+   `antennapod-fork-beta-v<n>` (nie als „Latest“ markiert). In Obtainium als
+   zweite App mit derselben Repo-URL hinzufügen, Filter `^antennapod-fork-beta-v`.
+   Neue Funktionen kommen erst auf `beta` und nach dem Testen per Merge auf `main`.
 
 ## Upstream-Updates übernehmen
 

@@ -38,8 +38,15 @@ android {
             resValue "string", "app_name", "AntennaPod Fork Debug"
         }
         release {
-            resValue "string", "provider_authority", "de.danoeh.antennapod.fork.provider"
-            resValue "string", "app_name", "AntennaPod Fork"
+            if (System.getenv("FORK_BETA") == "true") {
+                // Beta-Kanal (Branch beta): eigene App neben der stabilen Fork-App
+                applicationIdSuffix ".beta"
+                resValue "string", "provider_authority", "de.danoeh.antennapod.fork.beta.provider"
+                resValue "string", "app_name", "AntennaPod Fork Beta"
+            } else {
+                resValue "string", "provider_authority", "de.danoeh.antennapod.fork.provider"
+                resValue "string", "app_name", "AntennaPod Fork"
+            }
             minifyEnabled true
             shrinkResources true
             signingConfig signingConfigs.releaseConfig
