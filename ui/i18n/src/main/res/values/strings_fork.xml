@@ -7,4 +7,19 @@
     <string name="fork_notice_title">AntennaPod Fork – unofficial modified version</string>
     <string name="fork_notice_summary">Based on AntennaPod (© AntennaPod contributors), modified by Blaintino. Licensed under the GNU General Public License v3 and provided without any warranty. The AntennaPod team does NOT provide support for this version. Source code, changes and issues: github.com/Blaintino/AntennaPod</string>
     <string name="widget_sleep_window_only_label">Only usable during the sleep timer auto-enable window (%1$d:00–%2$d:00); otherwise tapping just opens the app</string>
+    <string name="outro_skip_label">Skip ad (jump behind outro)</string>
+    <string name="outro_capture_label">Remember ad outro</string>
+    <string name="outro_capture_hint">Tap this right after the ad outro has ended. Adjust length and end so that the preview contains only the jingle, then save. One outro is stored per podcast.</string>
+    <string name="outro_length_label">Length: %1$s s</string>
+    <string name="outro_end_offset_label">End relative to now: %1$s s</string>
+    <string name="outro_preview">Preview</string>
+    <string name="outro_save">Save</string>
+    <string name="outro_saved">Outro saved for this podcast</string>
+    <string name="outro_silent">The selection is (almost) silent – please adjust</string>
+    <string name="outro_not_downloaded">Only works for downloaded episodes</string>
+    <string name="outro_none_saved">No outro saved for this podcast yet (menu → Remember ad outro)</string>
+    <string name="outro_searching">Searching for outro…</string>
+    <string name="outro_found">Outro found, jumped to %1$s (score %2$s)</string>
+    <string name="outro_not_found">No outro in the next 10 minutes (best score %1$s at %2$s)</string>
+    <string name="outro_error">Could not read audio: %1$s</string>
 </resources>

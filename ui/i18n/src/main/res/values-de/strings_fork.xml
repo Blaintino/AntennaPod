@@ -7,4 +7,19 @@
     <string name="fork_notice_title">AntennaPod Fork – inoffizielle, veränderte Version</string>
     <string name="fork_notice_summary">Basiert auf AntennaPod (© AntennaPod-Mitwirkende), verändert von Blaintino. Lizenziert unter der GNU General Public License v3, ohne jegliche Gewährleistung. Das AntennaPod-Team leistet für diese Version KEINEN Support. Quellcode, Änderungen und Fehler: github.com/Blaintino/AntennaPod</string>
     <string name="widget_sleep_window_only_label">Nur im Schlummer-Zeitraum bedienbar (%1$d–%2$d Uhr), sonst öffnet Tippen nur die App</string>
+    <string name="outro_skip_label">Werbung überspringen (hinter das Outro springen)</string>
+    <string name="outro_capture_label">Werbe-Outro merken</string>
+    <string name="outro_capture_hint">Direkt nach dem Ende des Werbe-Outros antippen. Länge und Ende so einstellen, dass beim Probehören nur die Erkennungsmelodie zu hören ist, dann speichern. Pro Podcast wird ein Outro gespeichert.</string>
+    <string name="outro_length_label">Länge: %1$s s</string>
+    <string name="outro_end_offset_label">Ende relativ zu jetzt: %1$s s</string>
+    <string name="outro_preview">Probehören</string>
+    <string name="outro_save">Speichern</string>
+    <string name="outro_saved">Outro für diesen Podcast gespeichert</string>
+    <string name="outro_silent">Die Auswahl ist (fast) stumm – bitte anpassen</string>
+    <string name="outro_not_downloaded">Funktioniert nur bei heruntergeladenen Episoden</string>
+    <string name="outro_none_saved">Für diesen Podcast ist noch kein Outro gespeichert (Menü → Werbe-Outro merken)</string>
+    <string name="outro_searching">Suche Outro …</string>
+    <string name="outro_found">Outro gefunden, gesprungen zu %1$s (Score %2$s)</string>
+    <string name="outro_not_found">Kein Outro in den nächsten 10 Minuten (bester Score %1$s bei %2$s)</string>
+    <string name="outro_error">Audio konnte nicht gelesen werden: %1$s</string>
 </resources>

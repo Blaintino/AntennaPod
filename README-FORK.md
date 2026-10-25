@@ -36,7 +36,18 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    Widget auf dem Sperrbildschirm (Good Lock), das tagsüber in der Hosentasche
    nichts auslösen soll. Das Widget wird zu Beginn und Ende des Zeitraums
    automatisch aktualisiert (WorkManager).
-3. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
+3. **Werbung überspringen (Prototyp, nur Branch `feature/werbe-outro`)** – im
+   Player-Menü „Werbe-Outro merken“ direkt nach dem Ende eines Werbe-Outros
+   antippen, Länge (0,3–5 s) und Ende (±1,5 s) so einstellen, dass beim
+   Probehören nur die Erkennungsmelodie zu hören ist, speichern (eine Vorlage
+   pro Podcast, als PCM unter `files/outro/`). Der Button „Werbung
+   überspringen“ in der Player-Leiste sucht dann ab der aktuellen Position bis
+   zu 10 Minuten voraus nach dieser Melodie und springt direkt dahinter. Nur für
+   heruntergeladene Episoden. Technisch: Dekodieren per `MediaCodec`, Mono
+   8 kHz, 24 logarithmische Frequenzbänder pro 16-ms-Schritt, Pearson-Korrelation
+   gegen die Vorlage (lautstärkeunabhängig), Schwelle 0,45. Der Toast zeigt
+   den Score zur Kalibrierung.
+4. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
    damit der Fork **neben** dem originalen AntennaPod installiert werden kann
    (eigene Daten, eigener Provider). Abos/Fortschritt übernimmst du über
    Original → Einstellungen → Import/Export → Datenbank exportieren, dann im
