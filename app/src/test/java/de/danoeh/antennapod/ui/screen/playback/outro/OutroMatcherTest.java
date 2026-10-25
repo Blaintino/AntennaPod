@@ -10,7 +10,8 @@ import org.junit.Test;
 
 public class OutroMatcherTest {
     private static final int SR = OutroFeatureExtractor.SAMPLE_RATE;
-    private static final float THRESHOLD = OutroMatcher.DEFAULT_THRESHOLD;
+    // Synthetic signals (noise + tones) correlate less than real recordings of the same jingle
+    private static final float THRESHOLD = 0.45f;
 
     private static float[] tones(double[] freqs, double secondsEach, double gain) {
         int per = (int) (secondsEach * SR);

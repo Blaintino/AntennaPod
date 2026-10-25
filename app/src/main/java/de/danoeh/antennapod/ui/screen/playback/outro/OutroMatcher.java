@@ -9,7 +9,8 @@ import java.util.List;
  * change only adds a constant to all log energies.
  */
 public class OutroMatcher {
-    public static final float DEFAULT_THRESHOLD = 0.45f;
+    // Calibrated on a real podcast: the actual outro scored > 0.9, everything else < 0.8
+    public static final float DEFAULT_THRESHOLD = 0.85f;
     private final float[] template;
     private final int templateFrames;
     private final float threshold;
