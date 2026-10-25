@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class OutroMatcher {
     // Calibrated on a real podcast: the actual outro scored > 0.9, everything else < 0.8
-    public static final float DEFAULT_THRESHOLD = 0.85f;
+    public static final float DEFAULT_THRESHOLD = 0.8f;
     private final float[] template;
     private final int templateFrames;
     private final float threshold;
