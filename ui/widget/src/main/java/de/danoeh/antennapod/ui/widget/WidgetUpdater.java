@@ -18,6 +18,7 @@ import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 
 import de.danoeh.antennapod.ui.appstartintent.MediaButtonStarter;
+import de.danoeh.antennapod.ui.appstartintent.SkipAdOutroActivityStarter;
 import de.danoeh.antennapod.ui.common.Converter;
 import de.danoeh.antennapod.storage.preferences.SleepTimerPreferences;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
@@ -40,9 +41,8 @@ import de.danoeh.antennapod.ui.glide.FastBlurTransformation;
  */
 public abstract class WidgetUpdater {
     private static final String TAG = "WidgetUpdater";
-    private static final int LOCKED_BUTTON_ALPHA = 90;
     private static final int[] PLAYBACK_BUTTON_IDS = {R.id.butPlay, R.id.butPlayExtended, R.id.butRew,
-        R.id.butFastForward, R.id.butSkip, R.id.butLongRewind, R.id.butPlaybackSpeed};
+        R.id.butFastForward, R.id.butSkip, R.id.butLongRewind, R.id.butPlaybackSpeed, R.id.butSkipAd};
 
     public static class WidgetState {
         final Playable media;
@@ -161,16 +161,23 @@ public abstract class WidgetUpdater {
             boolean showFastForward = prefs.getBoolean(PlayerWidget.KEY_WIDGET_FAST_FORWARD + id, false);
             boolean showSkip = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SKIP + id, false);
             boolean showLongRewind = prefs.getBoolean(PlayerWidget.KEY_WIDGET_LONG_REWIND + id, false);
+            boolean showSkipAd = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SKIP_AD + id, false);
             boolean showCoverAsBcg = prefs.getBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + id, false);
 
-            if (buttonsOnly || showPlaybackSpeed || showRewind || showSkip || showFastForward || showLongRewind) {
+            boolean anyExtraButton = showPlaybackSpeed || showRewind || showSkip || showFastForward || showLongRewind
+                    || showSkipAd;
+            // Hiding play/pause is only allowed if another button remains, otherwise the widget would be empty
+            boolean hidePlay = anyExtraButton && prefs.getBoolean(PlayerWidget.KEY_WIDGET_HIDE_PLAY + id, false);
+            if (buttonsOnly || anyExtraButton) {
                 views.setInt(R.id.extendedButtonsContainer, "setVisibility", View.VISIBLE);
                 views.setInt(R.id.butPlay, "setVisibility", View.GONE);
+                views.setInt(R.id.butPlayExtended, "setVisibility", hidePlay ? View.GONE : View.VISIBLE);
                 views.setInt(R.id.butPlaybackSpeed, "setVisibility", showPlaybackSpeed ? View.VISIBLE : View.GONE);
                 views.setInt(R.id.butRew, "setVisibility", showRewind ? View.VISIBLE : View.GONE);
                 views.setInt(R.id.butFastForward, "setVisibility", showFastForward ? View.VISIBLE : View.GONE);
                 views.setInt(R.id.butSkip, "setVisibility", showSkip ? View.VISIBLE : View.GONE);
                 views.setInt(R.id.butLongRewind, "setVisibility", showLongRewind ? View.VISIBLE : View.GONE);
+                views.setInt(R.id.butSkipAd, "setVisibility", showSkipAd ? View.VISIBLE : View.GONE);
             } else {
                 views.setInt(R.id.extendedButtonsContainer, "setVisibility", View.GONE);
                 views.setInt(R.id.butPlay, "setVisibility", View.VISIBLE);
@@ -217,9 +224,8 @@ public abstract class WidgetUpdater {
             boolean sleepWindowOnly = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + id, false);
             anySleepWindowOnly |= sleepWindowOnly;
             boolean locked = sleepWindowOnly && !inSleepWindow;
-            for (int buttonId : PLAYBACK_BUTTON_IDS) {
-                views.setInt(buttonId, "setImageAlpha", locked ? LOCKED_BUTTON_ALPHA : 255);
-                if (locked) {
+            if (locked) {
+                for (int buttonId : PLAYBACK_BUTTON_IDS) {
                     views.setOnClickPendingIntent(buttonId, startMediaPlayer);
                 }
             }
@@ -251,6 +257,7 @@ public abstract class WidgetUpdater {
                 MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM));
         views.setOnClickPendingIntent(R.id.butLongRewind, MediaButtonStarter.createSessionCommandPendingIntent(
                 context, MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY));
+        views.setOnClickPendingIntent(R.id.butSkipAd, new SkipAdOutroActivityStarter(context).getPendingIntent());
     }
 
     private static long millisUntilNextSleepWindowBoundary() {

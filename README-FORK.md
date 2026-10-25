@@ -27,12 +27,17 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    Icon überall: Material „Replay 10“.
 2. **Widget-Option „Nur Buttons“** – blendet Cover, Titel und Fortschritt aus,
    das Widget zeigt nur noch Play/Pause und die angekreuzten Buttons. Die
+   Option **„Werbung überspringen“** (Button wie im Player, siehe 3.; öffnet
+   kurz den Such-Dialog, auch auf dem Sperrbildschirm) und
+   **„Play/Pause-Button ausblenden“**: geht nur, wenn mindestens ein
+   anderer Button gewählt ist (sonst wäre das Widget leer). Die
    Einstellungen gelten pro Widget – das Widget kann also z. B. einmal normal
    und einmal als reine Button-Leiste auf dem Homescreen liegen.
    Außerdem die Widget-Option **„Nur im Schlummer-Zeitraum bedienbar“**: nutzt
    den Zeitraum der Schlummer-Automatik (Schlummer-Dialog, z. B. 22–6 Uhr).
-   Außerhalb davon sind die Buttons dieses Widgets halbtransparent und ein
-   Tippen öffnet nur die App, statt die Wiedergabe zu steuern – gedacht für ein
+   Außerhalb davon öffnet ein Tippen auf die Buttons dieses Widgets nur die
+   App, statt die Wiedergabe zu steuern (die Buttons sehen dabei unverändert
+   aus – Abdunkeln/Ausblenden funktionierte auf dem Sperrbildschirm nicht) – gedacht für ein
    Widget auf dem Sperrbildschirm (Good Lock), das tagsüber in der Hosentasche
    nichts auslösen soll. Das Widget wird zu Beginn und Ende des Zeitraums
    automatisch aktualisiert (WorkManager).

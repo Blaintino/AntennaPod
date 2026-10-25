@@ -22,4 +22,5 @@
     <string name="outro_found">Outro gefunden, gesprungen zu %1$s (Score %2$s)</string>
     <string name="outro_not_found">Kein Outro in den nächsten 10 Minuten (bester Score %1$s bei %2$s)</string>
     <string name="outro_error">Audio konnte nicht gelesen werden: %1$s</string>
+    <string name="widget_hide_play_label">Play/Pause-Button ausblenden (nur wenn ein anderer Button gewählt ist)</string>
 </resources>

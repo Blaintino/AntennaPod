@@ -56,6 +56,18 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.screen.playback.outro.SkipAdOutroActivity"
+            android:noHistory="true"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.AntennaPod.Splash.Translucent">
+            <intent-filter>
+                <action android:name="de.danoeh.antennapod.intents.SKIP_AD_OUTRO" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
         <meta-data android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true"/>
         <meta-data android:name="com.google.android.gms.car.notification.SmallIcon"

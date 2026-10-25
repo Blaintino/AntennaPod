@@ -38,6 +38,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
     private CheckBox ckCoverAsBcg;
     private CheckBox ckButtonsOnly;
     private CheckBox ckSleepWindowOnly;
+    private CheckBox ckHidePlay;
+    private CheckBox ckSkipAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +105,10 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckCoverAsBcg.setOnClickListener(v -> displayPreviewPanel());
         ckButtonsOnly = findViewById(R.id.ckButtonsOnly);
         ckButtonsOnly.setOnClickListener(v -> displayPreviewPanel());
+        ckSkipAd = findViewById(R.id.ckSkipAd);
+        ckSkipAd.setOnClickListener(v -> displayPreviewPanel());
+        ckHidePlay = findViewById(R.id.ckHidePlay);
+        ckHidePlay.setOnClickListener(v -> displayPreviewPanel());
         ckSleepWindowOnly = findViewById(R.id.ckSleepWindowOnly);
         ckSleepWindowOnly.setText(getString(R.string.widget_sleep_window_only_label,
                 SleepTimerPreferences.autoEnableFrom(), SleepTimerPreferences.autoEnableTo()));
@@ -119,6 +125,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
         ckLongRewind.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_LONG_REWIND + appWidgetId, false));
         ckCoverAsBcg.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + appWidgetId, false));
         ckButtonsOnly.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + appWidgetId, false));
+        ckSkipAd.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_SKIP_AD + appWidgetId, false));
+        ckHidePlay.setChecked(prefs.getBoolean(PlayerWidget.KEY_WIDGET_HIDE_PLAY + appWidgetId, false));
         ckSleepWindowOnly.setChecked(
                 prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + appWidgetId, false));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -133,7 +141,7 @@ public class WidgetConfigActivity extends ToolbarActivity {
     private void displayPreviewPanel() {
         boolean showExtendedPreview =
                 ckPlaybackSpeed.isChecked() || ckRewind.isChecked() || ckFastForward.isChecked() || ckSkip.isChecked()
-                        || ckLongRewind.isChecked();
+                        || ckLongRewind.isChecked() || ckSkipAd.isChecked();
         widgetPreview.findViewById(R.id.extendedButtonsContainer)
                 .setVisibility(showExtendedPreview ? View.VISIBLE : View.GONE);
         widgetPreview.findViewById(R.id.butPlay).setVisibility(showExtendedPreview ? View.GONE : View.VISIBLE);
@@ -145,6 +153,10 @@ public class WidgetConfigActivity extends ToolbarActivity {
         widgetPreview.findViewById(R.id.butRew).setVisibility(ckRewind.isChecked() ? View.VISIBLE : View.GONE);
         widgetPreview.findViewById(R.id.butLongRewind)
                 .setVisibility(ckLongRewind.isChecked() ? View.VISIBLE : View.GONE);
+        widgetPreview.findViewById(R.id.butSkipAd).setVisibility(ckSkipAd.isChecked() ? View.VISIBLE : View.GONE);
+        ckHidePlay.setEnabled(showExtendedPreview);
+        widgetPreview.findViewById(R.id.butPlayExtended)
+                .setVisibility(showExtendedPreview && ckHidePlay.isChecked() ? View.GONE : View.VISIBLE);
 
         if (ckCoverAsBcg.isChecked()) {
             widgetPreview.findViewById(R.id.imgvCover).setVisibility(View.GONE);
@@ -196,6 +208,8 @@ public class WidgetConfigActivity extends ToolbarActivity {
         editor.putBoolean(PlayerWidget.KEY_WIDGET_COVER_BACKGROUND + appWidgetId, ckCoverAsBcg.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + appWidgetId, ckButtonsOnly.isChecked());
         editor.putBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + appWidgetId, ckSleepWindowOnly.isChecked());
+        editor.putBoolean(PlayerWidget.KEY_WIDGET_HIDE_PLAY + appWidgetId, ckHidePlay.isChecked());
+        editor.putBoolean(PlayerWidget.KEY_WIDGET_SKIP_AD + appWidgetId, ckSkipAd.isChecked());
         editor.apply();
 
         Intent resultValue = new Intent();

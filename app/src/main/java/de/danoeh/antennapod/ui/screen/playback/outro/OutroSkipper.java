@@ -76,18 +76,27 @@ public final class OutroSkipper {
 
     /** Searches the stored outro ahead of the current position and jumps right behind it. */
     public static void skip(Context context, FeedMedia media) {
+        skip(context, media, () -> { });
+    }
+
+    /**
+     * Like {@link #skip(Context, FeedMedia)}; {@code onFinished} runs once the search is over (or not started).
+     */
+    public static void skip(Context context, FeedMedia media, Runnable onFinished) {
         if (!checkPreconditions(context, media)) {
+            onFinished.run();
             return;
         }
         final long feedId = media.getItem().getFeedId();
         if (!OutroStore.has(context, feedId)) {
             Toast.makeText(context, R.string.outro_none_saved, Toast.LENGTH_LONG).show();
+            onFinished.run();
             return;
         }
         PlaybackController.bindToMedia3Service(context, controller -> {
             long position = controller.getCurrentMediaItem() != null
                     ? controller.getCurrentPosition() : media.getPosition();
-            runSearch(context, media, feedId, position);
+            runSearch(context, media, feedId, position, onFinished);
         });
     }
 
@@ -100,7 +109,8 @@ public final class OutroSkipper {
         return true;
     }
 
-    private static void runSearch(Context context, FeedMedia media, long feedId, long position) {
+    private static void runSearch(Context context, FeedMedia media, long feedId, long position,
+                                  Runnable onFinished) {
         AtomicBoolean cancelled = new AtomicBoolean(false);
         ProgressBar progress = new ProgressBar(context);
         progress.setIndeterminate(true);
@@ -111,8 +121,10 @@ public final class OutroSkipper {
                 .setView(progress)
                 .setNegativeButton(R.string.cancel_label, (d, w) -> cancelled.set(true))
                 .setOnCancelListener(d -> cancelled.set(true))
+                .setOnDismissListener(d -> onFinished.run())
                 .show();
 
+        // The calling activity may already be gone when the search ends (widget), so use the app context
         Context appContext = context.getApplicationContext();
         String path = media.getLocalFileUrl();
         long start = position + SEARCH_START_OFFSET_MS;
@@ -131,20 +143,20 @@ public final class OutroSkipper {
                     }
                     String score = String.format(Locale.US, "%.2f", result.score);
                     if (result.found) {
-                        seekTo(context, media, result.timeMs);
-                        Toast.makeText(context, context.getString(R.string.outro_found,
+                        seekTo(appContext, media, result.timeMs);
+                        Toast.makeText(appContext, appContext.getString(R.string.outro_found,
                                 Converter.getDurationStringLong((int) result.timeMs), score),
                                 Toast.LENGTH_LONG).show();
                     } else {
                         String at = result.timeMs >= 0
                                 ? Converter.getDurationStringLong((int) result.timeMs) : "–";
-                        Toast.makeText(context, context.getString(R.string.outro_not_found, score, at),
+                        Toast.makeText(appContext, appContext.getString(R.string.outro_not_found, score, at),
                                 Toast.LENGTH_LONG).show();
                     }
                 }, error -> {
                     progressDialog.dismiss();
                     Log.e(TAG, Log.getStackTraceString(error));
-                    Toast.makeText(context, context.getString(R.string.outro_error, error.getMessage()),
+                    Toast.makeText(appContext, appContext.getString(R.string.outro_error, error.getMessage()),
                             Toast.LENGTH_LONG).show();
                 });
     }
