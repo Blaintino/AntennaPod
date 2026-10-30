@@ -54,7 +54,13 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    8 kHz, 24 logarithmische Frequenzbänder pro 16-ms-Schritt, Pearson-Korrelation
    gegen die Vorlage (lautstärkeunabhängig), Schwelle 0,8 (am echten Podcast kalibriert: richtiges Outro über 0,9, alles andere unter 0,8). Der Toast zeigt
    den Score zur Kalibrierung.
-4. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
+4. **„Wer hat Play gedrückt?“** (Player-Menü ⋮) – Protokoll der letzten 40
+   Wiedergabe-Starts mit Uhrzeit und Auslöser (Widget, Benachrichtigung,
+   System-Mediensteuerung auf Sperrbildschirm/Schnelleinstellungen, Medientaste
+   bzw. Kopfhörer, App), um versehentliche Starts aufzuklären. Erfasst in
+   `Media3PlaybackService` (`play()`/`setPlayWhenReady()` + Herkunft des letzten
+   Media-Button-Events), gespeichert in `PlayStartLog`.
+5. **Eigene App-ID `de.danoeh.antennapod.fork`** und App-Name „AntennaPod Fork“,
    damit der Fork **neben** dem originalen AntennaPod installiert werden kann
    (eigene Daten, eigener Provider). Abos/Fortschritt übernimmst du über
    Original → Einstellungen → Import/Export → Datenbank exportieren, dann im

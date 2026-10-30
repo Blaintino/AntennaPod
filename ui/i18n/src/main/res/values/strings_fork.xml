@@ -24,4 +24,7 @@
     <string name="outro_error">Could not read audio: %1$s</string>
     <string name="widget_hide_play_label">Hide play/pause button (only if another button is selected)</string>
     <string name="widget_vertical_label">Arrange buttons vertically</string>
+    <string name="play_start_log_label">Who pressed play?</string>
+    <string name="play_start_log_empty">No playback starts recorded yet.</string>
+    <string name="play_start_log_clear">Clear</string>
 </resources>

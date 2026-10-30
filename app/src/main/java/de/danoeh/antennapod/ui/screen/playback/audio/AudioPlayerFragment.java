@@ -1,6 +1,7 @@
 package de.danoeh.antennapod.ui.screen.playback.audio;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -23,8 +24,10 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import de.danoeh.antennapod.model.feed.Feed;
+import de.danoeh.antennapod.playback.service.PlayStartLog;
 import de.danoeh.antennapod.playback.service.PlaybackController;
 import de.danoeh.antennapod.playback.service.internal.MediaLibrarySessionCallback;
 import de.danoeh.antennapod.playback.service.PlaybackService;
@@ -548,6 +551,9 @@ public class AudioPlayerFragment extends Fragment implements
             new TranscriptDialogFragment().show(
                     getActivity().getSupportFragmentManager(), TranscriptDialogFragment.TAG);
             return true;
+        } else if (itemId == R.id.play_start_log_item) {
+            showPlayStartLog();
+            return true;
         } else if (itemId == R.id.capture_ad_outro_item) {
             OutroSkipper.capture(getContext(), currentMedia);
             return true;
@@ -558,6 +564,17 @@ public class AudioPlayerFragment extends Fragment implements
             return true;
         }
         return false;
+    }
+
+    private void showPlayStartLog() {
+        List<String> entries = PlayStartLog.getEntries(requireContext());
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.play_start_log_label)
+                .setMessage(entries.isEmpty() ? getString(R.string.play_start_log_empty)
+                        : TextUtils.join("\n\n", entries))
+                .setPositiveButton(android.R.string.ok, null)
+                .setNeutralButton(R.string.play_start_log_clear, (d, w) -> PlayStartLog.clear(requireContext()))
+                .show();
     }
 
     private void openFeed(Feed feed) {

@@ -3,6 +3,7 @@ package de.danoeh.antennapod.playback.service;
 import android.content.Intent;
 import android.media.audiofx.LoudnessEnhancer;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.URLUtil;
@@ -159,6 +160,9 @@ public class Media3PlaybackService extends MediaLibraryService {
                     return;
                 }
 
+                if (!getPlayWhenReady()) {
+                    logPlayStart();
+                }
                 if (currentPlayable != null && !getPlayWhenReady()) {
                     long savedPosition = getCurrentPosition();
                     long startPosition = RewindAfterPauseUtils.calculatePositionWithRewind(
@@ -168,6 +172,14 @@ public class Media3PlaybackService extends MediaLibraryService {
                     }
                 }
                 super.play();
+            }
+
+            @Override
+            public void setPlayWhenReady(boolean playWhenReady) {
+                if (playWhenReady && !getPlayWhenReady()) {
+                    logPlayStart();
+                }
+                super.setPlayWhenReady(playWhenReady);
             }
 
             @Override
@@ -267,6 +279,43 @@ public class Media3PlaybackService extends MediaLibraryService {
         }
     }
 
+    /**
+     * Fork: source of the last media button event, so that the play it triggers can be attributed.
+     */
+    private String lastMediaButtonSource;
+    private long lastMediaButtonTime;
+
+    @UnstableApi
+    private void logPlayStart() {
+        String source;
+        if (lastMediaButtonSource != null && SystemClock.elapsedRealtime() - lastMediaButtonTime < 2000) {
+            source = lastMediaButtonSource;
+        } else {
+            MediaSession.ControllerInfo controller = mediaSession != null
+                    ? mediaSession.getControllerForCurrentRequest() : null;
+            source = describeController(controller);
+        }
+        lastMediaButtonSource = null;
+        Log.d(TAG, "Play started by: " + source);
+        PlayStartLog.add(this, source);
+    }
+
+    @UnstableApi
+    private String describeController(@Nullable MediaSession.ControllerInfo controller) {
+        if (controller == null) {
+            return "intern (z. B. Fortsetzen nach Unterbrechung)";
+        }
+        String pkg = controller.getPackageName();
+        if (mediaSession != null && mediaSession.isMediaNotificationController(controller)) {
+            return "Benachrichtigung";
+        } else if (getPackageName().equals(pkg)) {
+            return "App (Player/Liste)";
+        } else if ("com.android.systemui".equals(pkg)) {
+            return "System-Mediensteuerung, z. B. Sperrbildschirm/Schnelleinstellungen (" + pkg + ")";
+        }
+        return "andere App/Gerät (" + pkg + ")";
+    }
+
     @UnstableApi
     private boolean isRequestOfOtherApp() {
         MediaSession.ControllerInfo controller = mediaSession.getControllerForCurrentRequest();
@@ -309,6 +358,19 @@ public class Media3PlaybackService extends MediaLibraryService {
         public boolean onMediaButtonEvent(@NonNull MediaSession session,
                 @NonNull MediaSession.ControllerInfo controllerInfo, @NonNull Intent intent) {
             String action = intent.getStringExtra(MediaButtonStarter.EXTRA_SESSION_COMMAND);
+            KeyEvent keyEvent = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            if (MediaButtonStarter.MEDIA_BUTTON_SOURCE_WIDGET.equals(
+                    intent.getStringExtra(MediaButtonStarter.EXTRA_MEDIA_BUTTON_SOURCE))) {
+                lastMediaButtonSource = MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY.equals(action)
+                        ? "Widget (10 min zurück + Play)" : "Widget";
+            } else if (session.isMediaNotificationController(controllerInfo)) {
+                lastMediaButtonSource = "Benachrichtigung";
+            } else {
+                lastMediaButtonSource = "Medientaste, z. B. Kopfhörer"
+                        + (keyEvent != null ? " [" + KeyEvent.keyCodeToString(keyEvent.getKeyCode()) + "]" : "")
+                        + " (" + controllerInfo.getPackageName() + ")";
+            }
+            lastMediaButtonTime = SystemClock.elapsedRealtime();
             if (MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY.equals(action)) {
                 onCustomCommand(session, controllerInfo, new SessionCommand(action, Bundle.EMPTY), Bundle.EMPTY);
                 return true;

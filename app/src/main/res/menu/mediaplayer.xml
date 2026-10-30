@@ -30,6 +30,11 @@
     </item>
 
     <item
+        android:id="@+id/play_start_log_item"
+        custom:showAsAction="never"
+        android:title="@string/play_start_log_label">
+    </item>
+    <item
         android:id="@+id/capture_ad_outro_item"
         custom:showAsAction="never"
         android:title="@string/outro_capture_label">
