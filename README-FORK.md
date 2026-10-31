@@ -81,6 +81,12 @@ abdeckt): ein eigener 10-Minuten-Timer beim „10 min zurück“-Button, ein
 Sleep-Timer-Umschalt-Button im Widget und die Option „Erneutes Abspielen
 startet den Timer neu“.
 
+Versionsnummern: Der angezeigte Name ist `<upstream>-fork.<Build-Nr.>`, der
+interne `versionCode` ist upstreams Wert plus Build-Nummer. So ist jedes
+Update für Android/Obtainium eindeutig neuer (vorher war der `versionCode`
+bei allen Fork-Builds gleich, Obtainium hat v24 deshalb einmal nicht
+installiert).
+
 ## Einmalige Einrichtung
 
 1. **Actions aktivieren:** Im Fork-Repo auf GitHub → Tab *Actions* → „I understand

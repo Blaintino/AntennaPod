@@ -17,6 +17,9 @@ android {
         applicationId "de.danoeh.antennapod.fork"
         if (System.getenv("FORK_BUILD_NUMBER") != null) {
             versionNameSuffix "-fork." + System.getenv("FORK_BUILD_NUMBER")
+            // Fork: every CI build gets a higher versionCode, so installers (Obtainium) see a real update.
+            // Stays monotonic across upstream updates, since both the base and the build number only grow.
+            versionCode versionCode + Integer.parseInt(System.getenv("FORK_BUILD_NUMBER"))
         }
     }
 
