@@ -42,7 +42,12 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
    aus – Abdunkeln/Ausblenden funktionierte auf dem Sperrbildschirm nicht) – gedacht für ein
    Widget auf dem Sperrbildschirm (Good Lock), das tagsüber in der Hosentasche
    nichts auslösen soll. Das Widget wird zu Beginn und Ende des Zeitraums
-   automatisch aktualisiert (WorkManager).
+   automatisch aktualisiert (WorkManager). Weil Good Lock das Widget nicht
+   zuverlässig neu zeichnet, tragen die Buttons solcher Widgets zusätzlich das
+   Extra `sleep_window_only`: Wiedergabedienst bzw. „Werbung überspringen“
+   prüfen den Zeitraum beim Tippen selbst nochmal und ignorieren den Druck
+   außerhalb (Pausieren bleibt erlaubt; der ignorierte Druck erscheint in
+   „Wer hat Play gedrückt?“).
 3. **Werbung überspringen** – im
    Player-Menü „Werbe-Outro merken“ direkt nach dem Ende eines Werbe-Outros
    antippen, Länge (0,3–5 s) und Ende (±1,5 s) so einstellen, dass beim

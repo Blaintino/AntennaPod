@@ -97,9 +97,10 @@ public abstract class WidgetUpdater {
             Bundle options = manager.getAppWidgetOptions(id);
             SharedPreferences prefs = context.getSharedPreferences(PlayerWidget.PREFS_NAME, Context.MODE_PRIVATE);
             boolean vertical = prefs.getBoolean(PlayerWidget.KEY_WIDGET_VERTICAL + id, false);
+            boolean sleepWindowOnly = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + id, false);
             RemoteViews views = createViews(context, widgetState,
                     vertical ? R.layout.player_widget_vertical : R.layout.player_widget,
-                    startMediaPlayer, startPlaybackSpeedDialog);
+                    startMediaPlayer, startPlaybackSpeedDialog, sleepWindowOnly);
             boolean buttonsOnly = prefs.getBoolean(PlayerWidget.KEY_WIDGET_BUTTONS_ONLY + id, false);
             views.setViewVisibility(R.id.txtvTitle,
                     !buttonsOnly && widgetState.media != null ? View.VISIBLE : View.GONE);
@@ -180,7 +181,6 @@ public abstract class WidgetUpdater {
                     views.setImageViewResource(largeCover ? R.id.imgvCoverLarge : R.id.imgvCover, R.mipmap.ic_launcher);
                 }
             }
-            boolean sleepWindowOnly = prefs.getBoolean(PlayerWidget.KEY_WIDGET_SLEEP_WINDOW_ONLY + id, false);
             anySleepWindowOnly |= sleepWindowOnly;
             boolean locked = sleepWindowOnly && !inSleepWindow;
             if (locked) {
@@ -189,7 +189,7 @@ public abstract class WidgetUpdater {
                 }
             }
             if (!locked && widgetState.media != null) {
-                setPlaybackButtonIntents(context, views);
+                setPlaybackButtonIntents(context, views, sleepWindowOnly);
                 views.setOnClickPendingIntent(R.id.butPlaybackSpeed, startPlaybackSpeedDialog);
             }
 
@@ -207,7 +207,8 @@ public abstract class WidgetUpdater {
      * Fork: one RemoteViews per widget, because widgets may use different layouts (horizontal/vertical).
      */
     private static RemoteViews createViews(Context context, WidgetState widgetState, int layout,
-                                           PendingIntent startMediaPlayer, PendingIntent startPlaybackSpeedDialog) {
+                                           PendingIntent startMediaPlayer, PendingIntent startPlaybackSpeedDialog,
+                                           boolean sleepWindowOnly) {
         RemoteViews views = new RemoteViews(context.getPackageName(), layout);
 
         if (widgetState.media != null) {
@@ -238,7 +239,7 @@ public abstract class WidgetUpdater {
                 views.setImageViewResource(R.id.butPlayExtended, R.drawable.ic_widget_play);
                 views.setContentDescription(R.id.butPlayExtended, context.getString(R.string.play_label));
             }
-            setPlaybackButtonIntents(context, views);
+            setPlaybackButtonIntents(context, views, sleepWindowOnly);
         } else {
             // start the app if they click anything
             views.setOnClickPendingIntent(R.id.layout_left, startMediaPlayer);
@@ -254,20 +255,21 @@ public abstract class WidgetUpdater {
         return views;
     }
 
-    private static void setPlaybackButtonIntents(Context context, RemoteViews views) {
+    private static void setPlaybackButtonIntents(Context context, RemoteViews views, boolean sleepWindowOnly) {
         views.setOnClickPendingIntent(R.id.butPlay,
-                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_PLAY_PAUSE));
+                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_PLAY_PAUSE, sleepWindowOnly));
         views.setOnClickPendingIntent(R.id.butPlayExtended,
-                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_PLAY_PAUSE));
+                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_PLAY_PAUSE, sleepWindowOnly));
         views.setOnClickPendingIntent(R.id.butRew,
-                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_BACK));
+                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_BACK, sleepWindowOnly));
         views.setOnClickPendingIntent(R.id.butFastForward,
-                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_FORWARD));
-        views.setOnClickPendingIntent(R.id.butSkip,
-                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM));
+                MediaButtonStarter.createPendingIntent(context, Player.COMMAND_SEEK_FORWARD, sleepWindowOnly));
+        views.setOnClickPendingIntent(R.id.butSkip, MediaButtonStarter.createPendingIntent(
+                context, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM, sleepWindowOnly));
         views.setOnClickPendingIntent(R.id.butLongRewind, MediaButtonStarter.createSessionCommandPendingIntent(
-                context, MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY));
-        views.setOnClickPendingIntent(R.id.butSkipAd, new SkipAdOutroActivityStarter(context).getPendingIntent());
+                context, MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY, sleepWindowOnly));
+        views.setOnClickPendingIntent(R.id.butSkipAd,
+                new SkipAdOutroActivityStarter(context, sleepWindowOnly).getPendingIntent());
     }
 
     private static long millisUntilNextSleepWindowBoundary() {

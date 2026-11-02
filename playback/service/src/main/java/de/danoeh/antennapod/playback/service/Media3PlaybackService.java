@@ -300,6 +300,11 @@ public class Media3PlaybackService extends MediaLibraryService {
         PlayStartLog.add(this, source);
     }
 
+    private static boolean isInSleepWindowNow() {
+        return SleepTimerPreferences.isInTimeRange(SleepTimerPreferences.autoEnableFrom(),
+                SleepTimerPreferences.autoEnableTo(), Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+    }
+
     @UnstableApi
     private String describeController(@Nullable MediaSession.ControllerInfo controller) {
         if (controller == null) {
@@ -359,6 +364,19 @@ public class Media3PlaybackService extends MediaLibraryService {
                 @NonNull MediaSession.ControllerInfo controllerInfo, @NonNull Intent intent) {
             String action = intent.getStringExtra(MediaButtonStarter.EXTRA_SESSION_COMMAND);
             KeyEvent keyEvent = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            if (intent.getBooleanExtra(MediaButtonStarter.EXTRA_SLEEP_WINDOW_ONLY, false)
+                    && !isInSleepWindowNow()) {
+                boolean isPauseRequest = action == null && session.getPlayer().isPlaying()
+                        && keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE;
+                if (!isPauseRequest) {
+                    // Fork: the widget was not redrawn in time (lock screen); pausing stays allowed
+                    if (keyEvent == null || keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                        PlayStartLog.add(Media3PlaybackService.this,
+                                "Widget-Druck außerhalb des Schlummer-Zeitraums ignoriert");
+                    }
+                    return true;
+                }
+            }
             if (MediaButtonStarter.MEDIA_BUTTON_SOURCE_WIDGET.equals(
                     intent.getStringExtra(MediaButtonStarter.EXTRA_MEDIA_BUTTON_SOURCE))) {
                 lastMediaButtonSource = MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY.equals(action)

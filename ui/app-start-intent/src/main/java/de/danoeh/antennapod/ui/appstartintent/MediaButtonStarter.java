@@ -21,6 +21,13 @@ public abstract class MediaButtonStarter {
     public static final String MEDIA_BUTTON_SOURCE_WIDGET = "widget";
     public static final String EXTRA_SESSION_COMMAND = "session_command";
     public static final String SESSION_COMMAND_LONG_REWIND_PLAY = "long_rewind_play";
+    /**
+     * Fork: set on buttons of widgets that may only be used during the sleep timer auto-enable window.
+     * The service re-checks the window when the button is pressed, so it does not depend on the widget
+     * having been redrawn in time (lock screen widget hosts do not reliably do that).
+     */
+    public static final String EXTRA_SLEEP_WINDOW_ONLY = "sleep_window_only";
+    private static final int REQUEST_CODE_SLEEP_WINDOW_ONLY_BASE = 3000;
 
     public static Intent createIntent(Context context, int eventCode) {
         KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, eventCode);
@@ -41,14 +48,43 @@ public abstract class MediaButtonStarter {
                 .build();
     }
 
+    /**
+     * Like {@link #createPendingIntent(Context, int)}, but the service ignores the press outside of the
+     * sleep timer auto-enable window (a separate PendingIntent, so it can coexist with the normal one).
+     */
     @OptIn(markerClass = UnstableApi.class)
+    public static PendingIntent createPendingIntent(Context context, @Player.Command int command,
+                                                    boolean sleepWindowOnly) {
+        if (!sleepWindowOnly) {
+            return createPendingIntent(context, command);
+        }
+        Bundle extras = new Bundle();
+        extras.putString(EXTRA_MEDIA_BUTTON_SOURCE, MEDIA_BUTTON_SOURCE_WIDGET);
+        extras.putBoolean(EXTRA_SLEEP_WINDOW_ONLY, true);
+        Intent intent = PlaybackPendingIntentBuilder.createMediaButtonIntent(
+                context, command, extras, null, getMedia3ServiceClass());
+        int requestCode = REQUEST_CODE_SLEEP_WINDOW_ONLY_BASE + command;
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+        if (Build.VERSION.SDK_INT >= 26 && command == Player.COMMAND_PLAY_PAUSE) {
+            return PendingIntent.getForegroundService(context, requestCode, intent, flags);
+        }
+        return PendingIntent.getService(context, requestCode, intent, flags);
+    }
+
     public static PendingIntent createSessionCommandPendingIntent(Context context, String customAction) {
+        return createSessionCommandPendingIntent(context, customAction, false);
+    }
+
+    @OptIn(markerClass = UnstableApi.class)
+    public static PendingIntent createSessionCommandPendingIntent(Context context, String customAction,
+                                                                  boolean sleepWindowOnly) {
         Bundle extras = new Bundle();
         extras.putString(EXTRA_MEDIA_BUTTON_SOURCE, MEDIA_BUTTON_SOURCE_WIDGET);
         extras.putString(EXTRA_SESSION_COMMAND, customAction);
+        extras.putBoolean(EXTRA_SLEEP_WINDOW_ONLY, sleepWindowOnly);
         Intent intent = PlaybackPendingIntentBuilder.createMediaButtonIntent(
                 context, Player.COMMAND_PLAY_PAUSE, extras, null, getMedia3ServiceClass());
-        int requestCode = 1001;
+        int requestCode = sleepWindowOnly ? 1002 : 1001;
         int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
         if (Build.VERSION.SDK_INT >= 26) {
             return PendingIntent.getForegroundService(context, requestCode, intent, flags);

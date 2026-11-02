@@ -12,16 +12,27 @@ public class SkipAdOutroActivityStarter {
     public static final String INTENT = "de.danoeh.antennapod.intents.SKIP_AD_OUTRO";
     private final Intent intent;
     private final Context context;
+    private final boolean sleepWindowOnly;
 
     public SkipAdOutroActivityStarter(Context context) {
+        this(context, false);
+    }
+
+    /**
+     * @param sleepWindowOnly the activity ignores the request outside of the sleep timer auto-enable window
+     */
+    public SkipAdOutroActivityStarter(Context context, boolean sleepWindowOnly) {
         this.context = context;
+        this.sleepWindowOnly = sleepWindowOnly;
         intent = new Intent(INTENT);
         intent.setPackage(context.getPackageName());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        intent.putExtra(MediaButtonStarter.EXTRA_SLEEP_WINDOW_ONLY, sleepWindowOnly);
     }
 
     public PendingIntent getPendingIntent() {
-        return PendingIntent.getActivity(context, R.id.pending_intent_skip_ad_outro, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        return PendingIntent.getActivity(context, sleepWindowOnly
+                        ? R.id.pending_intent_skip_ad_outro_sleep_window : R.id.pending_intent_skip_ad_outro,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 }
