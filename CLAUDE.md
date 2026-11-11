@@ -128,7 +128,10 @@ weder Gerät noch Emulator, also kein `adb`.
    sagen, dass Obtainium das Update anbieten sollte. Kontrolle in der App: Einstellungen →
    Über → Version endet auf `-fork.<n>`.
 7. Nur Doku oder Vorbereitung ohne eigenes Release: Commit-Message mit `[skip ci]`.
-   Dann gibt es keinen Build; die Änderung kommt mit dem nächsten Release mit.
+   Dann gibt es keinen Build; die Änderung kommt mit dem nächsten Release mit. Achtung
+   bei PRs: Ein normaler Merge-Commit hat kein `[skip ci]` und löst ein Release aus.
+   Dann per „Squash and merge“ mit `[skip ci]` im Titel mergen, oder das Doku-Release
+   bewusst in Kauf nehmen.
 8. Zum Testen vor `main` den Beta-Kanal nur auf Wunsch nutzen: Branch `beta` pushen
    (siehe oben). Sonst liefert die Session eine Debug-APK als Datei.
 

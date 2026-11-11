@@ -27,7 +27,8 @@ Entscheidungen des Nutzers stehen kursiv dabei. Hintergrund siehe `CLAUDE.md`.
    dort Score ≥ 0,8? (Manchmal ist der Jingle anders abgemischt.)
 5. [ ] **Rückmeldung: Widget-Button „Werbung überspringen“ auf dem Good-Lock-Sperrbildschirm.**
    Erscheint der Such-Dialog ohne Entsperren (`setShowWhenLocked`)? Ungetestet.
-6. [ ] **Upstream-`checks.yml` auf Fork-PRs.** Beim ersten PR (Übergabe-Doku) beobachten,
+6. [ ] **Upstream-`checks.yml` auf Fork-PRs.** Beim nächsten Code-PR beobachten (der
+   Doku-PR lief mit `[skip ci]`, dort liefen die Checks nicht),
    ob Lint/Unit/Emulator-Jobs mit dem Fork-Code grün sind. Bei Rot: dokumentieren und
    mit dem Nutzer klären, ob die Jobs für den Fork angepasst oder ignoriert werden.
 
