@@ -26,13 +26,12 @@ werden per Merge übernommen (nie Rebase), damit die Fork-Commits sichtbar bleib
      sind wie upstream genau zwei Zusatz-Buttons wählbar).
    Icon überall: Material „Replay 10“.
 2. **Widget-Option „Nur Buttons“** – blendet Cover, Titel und Fortschritt aus,
-   das Widget zeigt nur noch Play/Pause und die angekreuzten Buttons. Die
-   Option **„Werbung überspringen“** (Button wie im Player, siehe 3.; öffnet
-   kurz den Such-Dialog, auch auf dem Sperrbildschirm) und
-   **„Play/Pause-Button ausblenden“**; mit **„Buttons untereinander
-   anordnen“** stehen die Buttons vertikal (eigenes Layout
-   `player_widget_vertical.xml`): geht nur, wenn mindestens ein
-   anderer Button gewählt ist (sonst wäre das Widget leer). Die
+   das Widget zeigt nur noch Play/Pause und die angekreuzten Buttons. Weitere
+   Widget-Optionen: **„Werbung überspringen“** (Button wie im Player, siehe 3.;
+   öffnet kurz den Such-Dialog, auch auf dem Sperrbildschirm),
+   **„Play/Pause-Button ausblenden“** (geht nur, wenn mindestens ein anderer
+   Button gewählt ist, sonst wäre das Widget leer) und **„Buttons untereinander
+   anordnen“** (Buttons vertikal, eigenes Layout `player_widget_vertical.xml`). Die
    Einstellungen gelten pro Widget – das Widget kann also z. B. einmal normal
    und einmal als reine Button-Leiste auf dem Homescreen liegen.
    Außerdem die Widget-Option **„Nur im Schlummer-Zeitraum bedienbar“**: nutzt
@@ -109,7 +108,8 @@ installiert).
    läuft neben der stabilen App) und veröffentlicht sie als Release
    `antennapod-fork-beta-v<n>` (nie als „Latest“ markiert). In Obtainium als
    zweite App mit derselben Repo-URL hinzufügen, Filter `^antennapod-fork-beta-v`.
-   Neue Funktionen kommen erst auf `beta` und nach dem Testen per Merge auf `main`.
+   Derzeit ungenutzt (Branch und Beta-Releases wurden auf Wunsch gelöscht); bei
+   Bedarf einfach wieder einen Branch `beta` pushen.
 
 ## Upstream-Updates übernehmen
 
@@ -146,7 +146,8 @@ Hinweis: GitHub pausiert zeitgesteuerte Workflows in öffentlichen Repos nach
 
 JDK 21 + Android SDK (`local.properties` mit `sdk.dir=…`), dann
 `./gradlew :app:assembleFreeDebug`. Die APK liegt unter
-`app/build/outputs/apk/free/debug/`.
+`app/build/outputs/apk/free/debug/`. Hinweise für Entwickler/Agenten (Ablauf,
+Entscheidungen, Fallen) stehen in `CLAUDE.md`, offene Punkte in `TODO.md`.
 
 ## Lizenz
 
