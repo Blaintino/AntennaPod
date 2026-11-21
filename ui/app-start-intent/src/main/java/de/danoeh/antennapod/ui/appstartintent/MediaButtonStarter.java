@@ -21,6 +21,7 @@ public abstract class MediaButtonStarter {
     public static final String MEDIA_BUTTON_SOURCE_WIDGET = "widget";
     public static final String EXTRA_SESSION_COMMAND = "session_command";
     public static final String SESSION_COMMAND_LONG_REWIND_PLAY = "long_rewind_play";
+    public static final String SESSION_COMMAND_SKIP_AD = "skip_ad";
     /**
      * Fork: set on buttons of widgets that may only be used during the sleep timer auto-enable window.
      * The service re-checks the window when the button is pressed, so it does not depend on the widget
@@ -84,7 +85,7 @@ public abstract class MediaButtonStarter {
         extras.putBoolean(EXTRA_SLEEP_WINDOW_ONLY, sleepWindowOnly);
         Intent intent = PlaybackPendingIntentBuilder.createMediaButtonIntent(
                 context, Player.COMMAND_PLAY_PAUSE, extras, null, getMedia3ServiceClass());
-        int requestCode = sleepWindowOnly ? 1002 : 1001;
+        int requestCode = (sleepWindowOnly ? 1002 : 1001) + (SESSION_COMMAND_SKIP_AD.equals(customAction) ? 10 : 0);
         int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
         if (Build.VERSION.SDK_INT >= 26) {
             return PendingIntent.getForegroundService(context, requestCode, intent, flags);

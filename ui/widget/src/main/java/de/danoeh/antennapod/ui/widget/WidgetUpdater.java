@@ -18,7 +18,6 @@ import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 
 import de.danoeh.antennapod.ui.appstartintent.MediaButtonStarter;
-import de.danoeh.antennapod.ui.appstartintent.SkipAdOutroActivityStarter;
 import de.danoeh.antennapod.ui.common.Converter;
 import de.danoeh.antennapod.storage.preferences.SleepTimerPreferences;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
@@ -268,8 +267,8 @@ public abstract class WidgetUpdater {
                 context, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM, sleepWindowOnly));
         views.setOnClickPendingIntent(R.id.butLongRewind, MediaButtonStarter.createSessionCommandPendingIntent(
                 context, MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY, sleepWindowOnly));
-        views.setOnClickPendingIntent(R.id.butSkipAd,
-                new SkipAdOutroActivityStarter(context, sleepWindowOnly).getPendingIntent());
+        views.setOnClickPendingIntent(R.id.butSkipAd, MediaButtonStarter.createSessionCommandPendingIntent(
+                context, MediaButtonStarter.SESSION_COMMAND_SKIP_AD, sleepWindowOnly));
     }
 
     private static long millisUntilNextSleepWindowBoundary() {

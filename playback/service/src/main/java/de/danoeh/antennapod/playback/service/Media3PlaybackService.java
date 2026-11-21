@@ -7,6 +7,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.URLUtil;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
@@ -58,6 +59,8 @@ import de.danoeh.antennapod.playback.service.internal.SkipUtils;
 import de.danoeh.antennapod.playback.service.internal.SleepTimer;
 import de.danoeh.antennapod.playback.service.internal.ClockSleepTimer;
 import de.danoeh.antennapod.playback.service.internal.EpisodeSleepTimer;
+import de.danoeh.antennapod.playback.service.outro.OutroSearch;
+import de.danoeh.antennapod.playback.service.outro.OutroStore;
 import de.danoeh.antennapod.storage.database.DBReader;
 import de.danoeh.antennapod.storage.database.DBWriter;
 import de.danoeh.antennapod.storage.preferences.PlaybackPreferences;
@@ -67,6 +70,7 @@ import de.danoeh.antennapod.storage.preferences.UserPreferences;
 import de.danoeh.antennapod.ui.appstartintent.MainActivityStarter;
 import de.danoeh.antennapod.ui.appstartintent.MediaButtonStarter;
 import de.danoeh.antennapod.ui.chapters.ChapterUtils;
+import de.danoeh.antennapod.ui.common.Converter;
 import de.danoeh.antennapod.ui.episodes.PlaybackSpeedUtils;
 import de.danoeh.antennapod.ui.notifications.NotificationUtils;
 import de.danoeh.antennapod.ui.widget.WidgetUpdater;
@@ -83,7 +87,9 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Media3PlaybackService extends MediaLibraryService {
     private static final String TAG = "M3PlaybackService";
@@ -97,6 +103,7 @@ public class Media3PlaybackService extends MediaLibraryService {
     private Disposable mediaLoaderDisposable;
     private Disposable positionObserverDisposable;
     private Disposable queueLoaderDisposable;
+    private Disposable skipAdDisposable;
     private long lastPositionSaveTime = 0;
     private String playedMediaId = null;
     private int playbackStartPosition = -1;
@@ -380,7 +387,9 @@ public class Media3PlaybackService extends MediaLibraryService {
             if (MediaButtonStarter.MEDIA_BUTTON_SOURCE_WIDGET.equals(
                     intent.getStringExtra(MediaButtonStarter.EXTRA_MEDIA_BUTTON_SOURCE))) {
                 lastMediaButtonSource = MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY.equals(action)
-                        ? "Widget (10 min zurück + Play)" : "Widget";
+                        ? "Widget (10 min zurück + Play)"
+                        : MediaButtonStarter.SESSION_COMMAND_SKIP_AD.equals(action)
+                        ? "Widget (Werbung überspringen)" : "Widget";
             } else if (session.isMediaNotificationController(controllerInfo)) {
                 lastMediaButtonSource = "Benachrichtigung";
             } else {
@@ -389,7 +398,8 @@ public class Media3PlaybackService extends MediaLibraryService {
                         + " (" + controllerInfo.getPackageName() + ")";
             }
             lastMediaButtonTime = SystemClock.elapsedRealtime();
-            if (MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY.equals(action)) {
+            if (MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY.equals(action)
+                    || MediaButtonStarter.SESSION_COMMAND_SKIP_AD.equals(action)) {
                 onCustomCommand(session, controllerInfo, new SessionCommand(action, Bundle.EMPTY), Bundle.EMPTY);
                 return true;
             }
@@ -429,6 +439,9 @@ public class Media3PlaybackService extends MediaLibraryService {
                     sessionPlayer.seekTo(Math.max(0, sessionPlayer.getCurrentPosition() - LONG_REWIND_MILLIS));
                     sessionPlayer.play();
                 });
+                return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
+            } else if (customCommand.customAction.equals(SESSION_COMMAND_SKIP_AD.customAction)) {
+                skipAdOutro();
                 return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
             }
             return super.onCustomCommand(session, controller, customCommand, args);
@@ -587,6 +600,10 @@ public class Media3PlaybackService extends MediaLibraryService {
         if (queueLoaderDisposable != null) {
             queueLoaderDisposable.dispose();
             queueLoaderDisposable = null;
+        }
+        if (skipAdDisposable != null) {
+            skipAdDisposable.dispose();
+            skipAdDisposable = null;
         }
         saveCurrentPosition();
         if (loudnessEnhancer != null) {
@@ -1022,6 +1039,67 @@ public class Media3PlaybackService extends MediaLibraryService {
     }
 
     @UnstableApi
+    private void skipAdOutro() {
+        Toast.makeText(this, R.string.outro_searching, Toast.LENGTH_SHORT).show();
+        if (skipAdDisposable != null && !skipAdDisposable.isDisposed()) {
+            return;
+        }
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+        skipAdDisposable = Maybe.fromCallable(() -> DBReader.getFeedMedia(
+                        PlaybackPreferences.getCurrentlyPlayingFeedMediaId()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(media -> {
+                    if (media.getItem() == null || !media.localFileAvailable() || media.getLocalFileUrl() == null) {
+                        return Maybe.empty();
+                    }
+                    long feedId = media.getItem().getFeedId();
+                    boolean loaded = player.getCurrentMediaItem() != null
+                            && String.valueOf(media.getId()).equals(player.getCurrentMediaItem().mediaId);
+                    long position = loaded ? player.getCurrentPosition() : media.getPosition();
+                    String path = media.getLocalFileUrl();
+                    return Maybe.fromCallable(() -> {
+                        if (!OutroStore.has(this, feedId)) {
+                            return new Pair<>(media, (OutroSearch.Result) null);
+                        }
+                        return new Pair<>(media, OutroSearch.search(this, feedId, path, position,
+                                media.getDuration(), cancelled));
+                    }).subscribeOn(Schedulers.io());
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnDispose(() -> cancelled.set(true))
+                .subscribe(pair -> {
+                    FeedMedia media = pair.first;
+                    OutroSearch.Result result = pair.second;
+                    if (result == null) {
+                        Toast.makeText(this, R.string.outro_none_saved, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    String score = String.format(Locale.US, "%.2f", result.score);
+                    if (!result.found) {
+                        String at = result.timeMs >= 0 ? Converter.getDurationStringLong((int) result.timeMs) : "–";
+                        Toast.makeText(this, getString(R.string.outro_not_found, score, at),
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (player.getCurrentMediaItem() != null
+                            && String.valueOf(media.getId()).equals(player.getCurrentMediaItem().mediaId)) {
+                        player.seekTo(result.timeMs);
+                    } else {
+                        media.setPosition((int) result.timeMs);
+                        DBWriter.setFeedMediaPlaybackInformation(media);
+                        EventBus.getDefault().post(new PlaybackPositionEvent(media.getPosition(),
+                                media.getDuration()));
+                    }
+                    Toast.makeText(this, getString(R.string.outro_found,
+                            Converter.getDurationStringLong((int) result.timeMs), score), Toast.LENGTH_LONG).show();
+                }, error -> {
+                    Log.e(TAG, Log.getStackTraceString(error));
+                    Toast.makeText(this, getString(R.string.outro_error, error.getMessage()),
+                            Toast.LENGTH_LONG).show();
+                }, () -> Toast.makeText(this, R.string.outro_not_downloaded, Toast.LENGTH_LONG).show());
+    }
+
     private void runWithCurrentMedia(MediaSession session, MediaSession.ControllerInfo controller, Runnable action) {
         if (session.getPlayer().getCurrentMediaItem() != null) {
             action.run();
