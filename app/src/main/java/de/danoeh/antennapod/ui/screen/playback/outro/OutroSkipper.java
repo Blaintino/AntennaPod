@@ -17,6 +17,11 @@ import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.event.playback.PlaybackPositionEvent;
 import de.danoeh.antennapod.model.feed.FeedMedia;
 import de.danoeh.antennapod.playback.service.PlaybackController;
+import de.danoeh.antennapod.playback.service.outro.OutroAudioReader;
+import de.danoeh.antennapod.playback.service.outro.OutroFeatureExtractor;
+import de.danoeh.antennapod.playback.service.outro.OutroMatcher;
+import de.danoeh.antennapod.playback.service.outro.OutroSearch;
+import de.danoeh.antennapod.playback.service.outro.OutroStore;
 import de.danoeh.antennapod.storage.database.DBWriter;
 import de.danoeh.antennapod.ui.common.Converter;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -25,7 +30,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.greenrobot.eventbus.EventBus;
@@ -40,8 +44,6 @@ public final class OutroSkipper {
     private static final long CAPTURE_AFTER_MS = 1500;
     private static final float DEFAULT_LENGTH_S = 2.0f;
     private static final float DEFAULT_END_OFFSET_S = -0.5f;
-    private static final long SEARCH_START_OFFSET_MS = 500;
-    private static final long SEARCH_RANGE_MS = 10 * 60 * 1000;
 
     private OutroSkipper() {
     }
@@ -127,13 +129,8 @@ public final class OutroSkipper {
         // The calling activity may already be gone when the search ends (widget), so use the app context
         Context appContext = context.getApplicationContext();
         String path = media.getLocalFileUrl();
-        long start = position + SEARCH_START_OFFSET_MS;
-        long end = start + SEARCH_RANGE_MS;
-        if (media.getDuration() > 0) {
-            end = Math.min(end, media.getDuration());
-        }
-        final long searchEnd = end;
-        Disposable unused = Single.fromCallable(() -> search(appContext, feedId, path, start, searchEnd, cancelled))
+        Disposable unused = Single.fromCallable(() -> OutroSearch.search(appContext, feedId, path, position,
+                        media.getDuration(), cancelled))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
@@ -159,28 +156,6 @@ public final class OutroSkipper {
                     Toast.makeText(appContext, appContext.getString(R.string.outro_error, error.getMessage()),
                             Toast.LENGTH_LONG).show();
                 });
-    }
-
-    private static SearchResult search(Context context, long feedId, String path, long startMs, long endMs,
-                                       AtomicBoolean cancelled) throws IOException {
-        float[] template = OutroStore.load(context, feedId);
-        if (template == null) {
-            throw new IOException("No template");
-        }
-        OutroMatcher matcher = new OutroMatcher(OutroFeatureExtractor.extract(template),
-                OutroMatcher.DEFAULT_THRESHOLD);
-        OutroFeatureExtractor extractor = new OutroFeatureExtractor();
-        long firstMs = OutroAudioReader.read(context, path, startMs, endMs, (samples, count) -> {
-            List<float[]> frames = extractor.push(samples, 0, count);
-            return !matcher.push(frames) && !cancelled.get();
-        });
-        SearchResult result = new SearchResult();
-        result.found = matcher.hasMatch();
-        result.score = result.found ? matcher.getMatchScore() : matcher.getBestScore();
-        long frame = result.found ? matcher.getMatchEndFrame() : matcher.getBestEndFrame();
-        result.timeMs = frame < 0 || firstMs < 0 ? -1 : firstMs
-                + OutroFeatureExtractor.frameEndSample(frame) * 1000 / OutroFeatureExtractor.SAMPLE_RATE;
-        return result;
     }
 
     private static void seekTo(Context context, FeedMedia media, long timeMs) {
@@ -356,11 +331,5 @@ public final class OutroSkipper {
         float[] samples;
         int count;
         long firstMs;
-    }
-
-    private static class SearchResult {
-        boolean found;
-        float score;
-        long timeMs;
     }
 }

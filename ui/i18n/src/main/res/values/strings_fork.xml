@@ -8,6 +8,7 @@
     <string name="fork_notice_summary">Based on AntennaPod (© AntennaPod contributors), modified by Blaintino. Licensed under the GNU General Public License v3 and provided without any warranty. The AntennaPod team does NOT provide support for this version. Source code, changes and issues: github.com/Blaintino/AntennaPod</string>
     <string name="widget_sleep_window_only_label">Only usable during the sleep timer auto-enable window (%1$d:00–%2$d:00); otherwise tapping just opens the app</string>
     <string name="outro_skip_label">Skip ad (jump behind outro)</string>
+    <string name="outro_skip_short_label">Skip ad</string>
     <string name="outro_capture_label">Remember ad outro</string>
     <string name="outro_capture_hint">Tap this right after the ad outro has ended. Adjust length and end so that the preview contains only the jingle, then save. One outro is stored per podcast.</string>
     <string name="outro_length_label">Length: %1$s s</string>

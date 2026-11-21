@@ -80,6 +80,8 @@ public class MediaLibrarySessionCallback implements MediaLibraryService.MediaLib
             = new SessionCommand("extend_sleep_timer", Bundle.EMPTY);
     public static final SessionCommand SESSION_COMMAND_LONG_REWIND_PLAY
             = new SessionCommand(MediaButtonStarter.SESSION_COMMAND_LONG_REWIND_PLAY, Bundle.EMPTY);
+    public static final SessionCommand SESSION_COMMAND_SKIP_AD
+            = new SessionCommand(MediaButtonStarter.SESSION_COMMAND_SKIP_AD, Bundle.EMPTY);
 
     private static final String EXTRA_VALUE = "value";
 
@@ -126,6 +128,7 @@ public class MediaLibrarySessionCallback implements MediaLibraryService.MediaLib
                 .add(SESSION_COMMAND_DISABLE_SLEEP_TIMER)
                 .add(SESSION_COMMAND_EXTEND_SLEEP_TIMER)
                 .add(SESSION_COMMAND_LONG_REWIND_PLAY)
+                .add(SESSION_COMMAND_SKIP_AD)
                 .build();
         Player.Commands playerCommands = new Player.Commands.Builder()
                 .addAllCommands()
@@ -191,6 +194,14 @@ public class MediaLibrarySessionCallback implements MediaLibraryService.MediaLib
                     .setSessionCommand(SESSION_COMMAND_LONG_REWIND_PLAY)
                     .setCustomIconResId(R.drawable.ic_notification_long_rewind)
                     .setDisplayName(context.getString(R.string.long_rewind_play_label))
+                    .build());
+        }
+
+        if (UserPreferences.showSkipAdOnFullNotification()) {
+            buttons.add(new CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+                    .setSessionCommand(SESSION_COMMAND_SKIP_AD)
+                    .setCustomIconResId(R.drawable.ic_notification_skip_ad)
+                    .setDisplayName(context.getString(R.string.outro_skip_label))
                     .build());
         }
 

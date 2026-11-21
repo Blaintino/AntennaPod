@@ -1,4 +1,4 @@
-package de.danoeh.antennapod.ui.screen.playback.outro;
+package de.danoeh.antennapod.playback.service.outro;
 
 import android.content.Context;
 import android.media.AudioFormat;

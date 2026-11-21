@@ -260,6 +260,7 @@
         <item>@string/playback_speed</item>
         <item>@string/sleep_timer_label</item>
         <item>@string/widget_long_rewind_play_label</item>
+        <item>@string/outro_skip_short_label</item>
     </string-array>
 
     <string-array name="default_page_values">

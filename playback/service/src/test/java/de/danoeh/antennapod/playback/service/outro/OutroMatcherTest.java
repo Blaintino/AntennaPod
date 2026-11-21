@@ -1,4 +1,4 @@
-package de.danoeh.antennapod.ui.screen.playback.outro;
+package de.danoeh.antennapod.playback.service.outro;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
