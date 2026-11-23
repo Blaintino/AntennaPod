@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -128,6 +129,8 @@ public abstract class WidgetUpdater {
             // Hiding play/pause is only allowed if another button remains, otherwise the widget would be empty
             boolean hidePlay = anyExtraButton && prefs.getBoolean(PlayerWidget.KEY_WIDGET_HIDE_PLAY + id, false);
             if (buttonsOnly || anyExtraButton) {
+                views.setViewPadding(R.id.textAndButtons, 0, 0, 0,
+                        context.getResources().getDimensionPixelSize(R.dimen.widget_buttons_min_height));
                 views.setInt(R.id.extendedButtonsContainer, "setVisibility", View.VISIBLE);
                 views.setInt(R.id.butPlay, "setVisibility", View.GONE);
                 views.setInt(R.id.butPlayExtended, "setVisibility", hidePlay ? View.GONE : View.VISIBLE);
@@ -138,6 +141,7 @@ public abstract class WidgetUpdater {
                 views.setInt(R.id.butLongRewind, "setVisibility", showLongRewind ? View.VISIBLE : View.GONE);
                 views.setInt(R.id.butSkipAd, "setVisibility", showSkipAd ? View.VISIBLE : View.GONE);
             } else {
+                views.setViewPadding(R.id.textAndButtons, 0, 0, 0, 0);
                 views.setInt(R.id.extendedButtonsContainer, "setVisibility", View.GONE);
                 views.setInt(R.id.butPlay, "setVisibility", View.VISIBLE);
             }
@@ -150,6 +154,8 @@ public abstract class WidgetUpdater {
                 views.setViewVisibility(R.id.imgvCover, View.GONE);
                 views.setViewVisibility(R.id.imgvCoverLarge, View.GONE);
                 views.setViewVisibility(R.id.imgvBackground, View.VISIBLE);
+                views.setInt(R.id.layout_center, "setGravity", Gravity.CENTER_VERTICAL | Gravity.START);
+                views.setInt(R.id.textAndButtons, "setGravity", Gravity.CENTER_VERTICAL | Gravity.START);
                 int iconSize = 4 * context.getResources().getDimensionPixelSize(android.R.dimen.app_icon_size);
                 Bitmap icon = null;
                 if (widgetState.media != null) {
@@ -166,6 +172,21 @@ public abstract class WidgetUpdater {
                 views.setViewVisibility(R.id.imgvCover, largeCover ? View.GONE : View.VISIBLE);
                 views.setViewVisibility(R.id.imgvCoverLarge, largeCover ? View.VISIBLE : View.GONE);
                 views.setViewVisibility(R.id.imgvBackground, View.GONE);
+                if (largeCover && !anyExtraButton) {
+                    views.setViewPadding(R.id.textAndButtons, 0, 0, 0,
+                            context.getResources().getDimensionPixelSize(R.dimen.widget_buttons_min_height));
+                    views.setInt(R.id.extendedButtonsContainer, "setVisibility", View.VISIBLE);
+                    views.setInt(R.id.butPlay, "setVisibility", View.GONE);
+                    views.setInt(R.id.butPlaybackSpeed, "setVisibility", View.GONE);
+                    views.setInt(R.id.butRew, "setVisibility", View.GONE);
+                    views.setInt(R.id.butFastForward, "setVisibility", View.GONE);
+                    views.setInt(R.id.butSkip, "setVisibility", View.GONE);
+                    views.setInt(R.id.butLongRewind, "setVisibility", View.GONE);
+                    views.setInt(R.id.butSkipAd, "setVisibility", View.GONE);
+                }
+                int gravity = largeCover ? Gravity.CENTER : Gravity.CENTER_VERTICAL | Gravity.START;
+                views.setInt(R.id.layout_center, "setGravity", gravity);
+                views.setInt(R.id.textAndButtons, "setGravity", gravity);
                 int iconSize = largeCover
                         ? context.getResources().getDimensionPixelSize(R.dimen.widget_cover_large)
                         : context.getResources().getDimensionPixelSize(android.R.dimen.app_icon_size);
